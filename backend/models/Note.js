@@ -20,6 +20,10 @@ const NoteSchema = new Schema({
       return date;
     },
   },
+  favourited: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const Note = mongoose.model("note", NoteSchema);

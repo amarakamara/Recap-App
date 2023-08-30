@@ -66,6 +66,31 @@ app.get("/view/:id", async (req, res) => {
   res.json(response);
 });
 
+/*Update favourite note*/
+
+app.get("/favourites", async (req, res) => {
+  const response = await Note.find({ favourited: true });
+  res.json(response);
+});
+
+app.put("/toggleFavourites/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const note = await Note.findByIdAndUpdate({ _id: id });
+
+    if (note.favourited) {
+      note.favourited = false;
+      await note.save();
+    } else {
+      note.favourited = true;
+      await note.save();
+    }
+    console.log("Update Done on favourites!");
+  } catch (error) {
+    console.error("Error" + error.message);
+  }
+});
+
 app.listen(3001, () => {
   console.log("Server started on port 3001");
 });

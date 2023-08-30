@@ -97,6 +97,7 @@ export default function App() {
                 content={note.content}
                 onDelete={deleteNote}
                 date={note.createdAt}
+                favourited={note.favourited}
               />
             ))
           )}
