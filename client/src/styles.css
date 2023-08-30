@@ -1,0 +1,641 @@
+html {
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background-image: url("https://www.transparenttextures.com/patterns/always-grey.png");
+}
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ol,
+ul {
+  margin: 0;
+  padding: 0;
+  font-weight: normal;
+}
+
+ol,
+ul {
+  list-style: none;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-areas:
+    "header header header header header header"
+    "menu main main main right right"
+    "footer footer footer footer footer footer";
+  grid-template-columns: max-content 1fr 1fr 1fr max-content max-content;
+  grid-template-rows: max-content 1fr max-content;
+  gap: 10px;
+  height: 100vh;
+  overflow: hidden;
+}
+
+header {
+  background: rgb(2, 0, 36);
+  background: linear-gradient(
+    160deg,
+    rgba(2, 0, 36, 1) 0%,
+    rgba(9, 55, 121, 1) 35%,
+    rgba(0, 212, 255, 1) 100%
+  );
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+    rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+  padding: 5px 20px;
+  grid-area: header;
+}
+.header-inner {
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  flex-basis: 1/2;
+}
+.header-inner > * {
+  width: 100%;
+  padding: 2px 0;
+}
+
+.btn-div,
+.logo-div {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.btn-div button {
+  position: absolute;
+  right: 0;
+  display: none;
+}
+
+.logo-img {
+  width: 30%;
+}
+
+.header-inner button {
+  background-color: transparent;
+  color: #fff;
+  border: 0;
+}
+/*footer*/
+footer {
+  text-align: center;
+  grid-area: footer;
+}
+footer p {
+  color: rgba(0, 212, 255, 1);
+  margin: 5px 0;
+}
+
+/*Ad space*/
+.ad {
+  color: #eff6e0ff;
+  padding: 20px 10px;
+  grid-area: right;
+  overflow: hidden;
+}
+
+.ad p {
+  font-size: 2rem;
+  margin-right: 80px;
+}
+
+.note-count {
+  margin-right: 20px;
+}
+
+.note-count h2 {
+  background: rgb(2, 0, 36);
+  background: linear-gradient(
+    120deg,
+    rgba(2, 0, 36, 1) 0%,
+    rgba(9, 55, 121, 1) 35%,
+    rgba(0, 212, 255, 1) 100%
+  );
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+    rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+  font-family: "Jost", sans-serif;
+  font-size: 1.5rem;
+  color: #fff;
+  padding: 0 2px;
+}
+.note-count h3 {
+  font-size: 4rem;
+  color: rgba(9, 55, 121);
+}
+/*Menus*/
+.menu {
+  background: rgb(2, 0, 36);
+  background: linear-gradient(
+    110deg,
+    rgba(2, 0, 36, 1) 0%,
+    rgba(9, 55, 121, 1) 35%,
+    rgba(0, 212, 255, 1) 100%
+  );
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+    rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+  border-radius: 0 7px 7px 0;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  justify-content: center;
+  align-items: center;
+  width: auto;
+  height: 80%;
+  margin: auto 0;
+  padding: 20px 5px 0 10px;
+  grid-area: menu;
+}
+
+.menu li {
+  margin: 30px 0;
+}
+/*Mobile Menu*/
+.mobile-menu {
+  max-width: 50vw;
+  width: 40vw;
+  height: 50vh;
+  background-color: #fff;
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+    rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: none;
+  z-index: 1000;
+}
+
+.mobile-menu ul {
+  margin: 20px 0;
+}
+.mobile-menu li {
+  font-size: 2rem;
+  margin-left: 10px;
+  margin: 10px;
+}
+
+.mobile-menu .link-mobile {
+  text-decoration: none;
+  color: rgba(9, 55, 121);
+}
+.mobile-menu button {
+  background-color: transparent;
+  border: none;
+  color: #fff;
+}
+
+.menu li .link-items {
+  color: #fff;
+}
+
+.mobile-menu .top {
+  width: 100%;
+  padding: 5px 0;
+  margin: 0;
+  background: rgb(2, 0, 36);
+  background: linear-gradient(
+    110deg,
+    rgba(2, 0, 36, 1) 0%,
+    rgba(9, 55, 121, 1) 35%,
+    rgba(0, 212, 255, 1) 100%
+  );
+}
+/*Main Content area*/
+.container {
+  width: 100%;
+  height: 100%;
+  padding-left: 15px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  grid-area: main;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.container::-webkit-scrollbar {
+  width: 0; /* Hide default scrollbar for WebKit browsers (Chrome, Safari, etc.) */
+}
+.message {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: rgba(9, 55, 121);
+  background-color: #fff;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+/*Each Note*/
+.note {
+  background: #fff;
+  border-radius: 7px;
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+    rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+  width: 290px;
+  margin: 10px 16px;
+  float: left;
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+}
+
+.note {
+  background: #fff;
+  border-radius: 7px;
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+    rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+  width: 290px;
+  max-height: auto;
+  margin: 10px 16px;
+  float: left;
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  align-self: start;
+}
+
+.note h1 {
+  color: rgba(9, 55, 121);
+  font-family: "Jost", sans-serif;
+  font-size: 1.5rem;
+  margin-bottom: 6px;
+  margin-top: 10%;
+  display: block;
+}
+
+.note p {
+  font-size: 1.1em;
+  margin-bottom: 10px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  display: block;
+}
+
+.note div:nth-child(1) {
+  padding: 5px 10px;
+}
+
+.note div:nth-child(1) a {
+  font-size: 1rem;
+  color: rgba(9, 55, 121);
+}
+
+.note-meta {
+  width: 100%;
+  padding: 0 10px;
+  margin-top: 2px;
+  background-color: rgba(9, 55, 121);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  position: relative;
+  bottom: 0;
+  z-index: 0;
+}
+
+.note-meta p {
+  font-size: 0.9rem;
+  color: #fff;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: auto 0;
+  width: 100%;
+}
+.note-tools {
+  display: flex;
+  flex-direction: row;
+  padding: 0;
+  margin: 0;
+  margin-left: auto;
+}
+.edit-button {
+  border: 0;
+  color: #fff;
+  margin: 0%;
+  background-color: transparent;
+}
+.delete-btn {
+  border: 0;
+  background-color: transparent;
+  color: #fff;
+  margin: 0;
+}
+
+/*Create Note button and form*/
+.wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.note-box {
+  width: 35vw;
+  max-height: auto;
+  height: auto;
+  background: #fff;
+  border-radius: 7px;
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+    rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+  display: flex;
+  flex-direction: column;
+  padding: 1% 0 0;
+  position: absolute;
+  left: auto;
+  right: auto;
+  top: auto;
+  bottom: 30%;
+  z-index: 100;
+  overflow: auto;
+}
+.note-box p {
+  margin-left: 20px;
+}
+
+.note-box input {
+  border: none;
+  margin-bottom: 3%;
+  margin-top: 5%;
+  margin-left: 2%;
+  padding: 10px;
+  display: block;
+}
+
+.note-box textarea {
+  border: none;
+  margin-bottom: 10%;
+  margin-left: 2%;
+  padding: 10px;
+  display: block;
+}
+
+.note-box input::placeholder,
+textarea::placeholder {
+  font-size: 1.2rem;
+  font-size: bold;
+  color: #ccc;
+  font-family: "Montserrat", sans-serif;
+}
+form.note-box button {
+  background-color: rgba(9, 55, 121);
+  margin-bottom: 0;
+  background: rgb(2, 0, 36);
+  background: linear-gradient(
+    110deg,
+    rgba(2, 0, 36, 1) 0%,
+    rgba(9, 55, 121, 1) 35%,
+    rgba(0, 212, 255, 1) 100%
+  );
+  font-family: "Jost", sans-serif;
+  font-size: 0.9rem;
+}
+form.note-box button.cancel-btn {
+  background: none;
+  color: rgba(9, 55, 121);
+  border: none;
+  width: 10%;
+  position: absolute;
+  right: 0;
+}
+
+form.buttonForm button {
+  height: 40px;
+  width: 40px;
+  background-color: rgba(9, 55, 121);
+  color: #fff;
+  position: fixed;
+  right: 9%;
+  bottom: 10%;
+  z-index: 100;
+}
+
+/* Editing a note page*/
+form.edit-form {
+  width: 80%;
+  background-color: #fff;
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+    rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+  border-radius: 7px;
+  padding: 10px;
+  margin: 20px auto;
+}
+
+form.edit-form input {
+  display: block;
+  border: 1.1px solid rgba(9, 55, 121);
+  border-radius: 7px;
+  margin-bottom: 30px;
+  width: 100%;
+  height: 10%;
+  padding-left: 10px;
+}
+
+form.edit-form textarea {
+  display: block;
+  border: 1.1px solid rgba(9, 55, 121);
+  border-radius: 7px;
+  width: 100%;
+  height: 65%;
+  padding-left: 10px;
+}
+form.edit-form button {
+  width: 100%;
+  margin: 10px auto 0;
+  background: rgb(2, 0, 36);
+  background: linear-gradient(
+    110deg,
+    rgba(2, 0, 36, 1) 0%,
+    rgba(9, 55, 121, 1) 35%,
+    rgba(0, 212, 255, 1) 100%
+  );
+  font-family: "Jost", sans-serif;
+  font-size: 0.9rem;
+}
+form.edit-form input::value {
+  font-family: "Jost", sans-serif;
+}
+
+form.edit-form textarea::value {
+  font-family: "Poppins", sans-serif;
+}
+/*View A Note*/
+.view-note {
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  color: rgba(9, 55, 121);
+  padding: 20px 40px;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+    rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+}
+
+.view-note::-webkit-scrollbar {
+  display: none;
+}
+
+.view-note h2 {
+  font-family: "Jost", sans-serif;
+}
+.view-note p {
+  font-size: 1.2rem;
+  padding: 20px 0 0;
+}
+
+.view-note hr {
+  width: 100%;
+  height: 5px;
+  background: rgb(2, 0, 36);
+  background: linear-gradient(
+    110deg,
+    rgba(2, 0, 36, 1) 0%,
+    rgba(9, 55, 121, 1) 35%,
+    rgba(0, 212, 255, 1) 100%
+  );
+}
+
+/*media queries*/
+
+/* Mobile */
+@media screen and (max-width: 479px) {
+  .note {
+    flex: 100% !important;
+  }
+  .btn-div button {
+    display: block;
+  }
+  .logo-img {
+    width: 30%;
+  }
+  .mobile-menu {
+    display: block;
+  }
+  .menu,
+  .ad {
+    display: none;
+  }
+  .note h1 {
+    font-size: 0.9rem;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  .note p {
+    font-size: 0.9rem;
+  }
+  .note-meta p {
+    font-size: 0.7rem;
+  }
+  .note-box {
+    width: 50vw;
+  }
+}
+
+@media screen and (min-width: 480px) and (max-width: 600px) {
+  .btn-div button {
+    display: block;
+  }
+  .logo-img {
+    width: 30%;
+  }
+  .mobile-menu {
+    display: block;
+  }
+  .menu,
+  .ad {
+    display: none;
+  }
+
+  .note {
+    flex: 33.3% !important;
+  }
+  .note h1 {
+    font-size: 0.9rem;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  .note p {
+    font-size: 0.9rem;
+  }
+  .note-meta p {
+    font-size: 0.7rem;
+  }
+  .note-box {
+    width: 60vw;
+  }
+}
+
+/*custom*/
+@media screen and (min-width: 600px) and (max-width: 767px) {
+  .note {
+    flex: 33.3% !important;
+  }
+  .mobile-menu {
+    display: block;
+  }
+  .menu,
+  .ad {
+    display: none;
+  }
+  .btn-div button {
+    display: block;
+  }
+  .note-box {
+    width: 60vw;
+  }
+}
+/* Tablet */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .note {
+    flex: 33.3% !important;
+  }
+  .note-box {
+    width: 45vw;
+  }
+}
+
+/* Laptop */
+@media screen and (min-width: 1024px) {
+  .note {
+    flex: 33.33% !important;
+  }
+}
+
+/* Large */
+@media screen and (min-width: 1200px) {
+  .note {
+    flex: 25% !important;
+  }
+}
