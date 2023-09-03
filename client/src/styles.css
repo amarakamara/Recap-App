@@ -38,6 +38,7 @@ img {
   height: auto;
 }
 
+
 .grid-container {
   display: grid;
   grid-template-areas:

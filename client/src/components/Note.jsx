@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { NavLink } from "react-router-dom";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
@@ -19,7 +19,7 @@ function Note(props) {
 
   const toggleFavourites = async () => {
     try {
-      const response = await fetch(api_base + `/toggleFavourites/${props.id}`, {
+      await fetch(api_base + `/toggleFavourites/${props.id}`, {
         method: "PUT",
       });
     } catch (error) {

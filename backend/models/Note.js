@@ -1,8 +1,10 @@
 import mongoose from "mongoose";
+import passportLocalMongoose from "passport-local-mongoose";
+import User from "./user.js";
 
 const Schema = mongoose.Schema;
 
-const NoteSchema = new Schema({
+const noteSchema = new Schema({
   title: {
     type: String,
     required: true,
@@ -24,8 +26,14 @@ const NoteSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
 });
 
-const Note = mongoose.model("note", NoteSchema);
+noteSchema.plugin(passportLocalMongoose);
+
+const Note = mongoose.model("note", noteSchema);
 
 export default Note;

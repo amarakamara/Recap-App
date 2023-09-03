@@ -1,28 +1,44 @@
-import React, { useState, useEffect } from "react";
-import Header from "./Header";
+import React, { /* useState*/ useEffect } from "react";
+/*import Header from "./Header";
 import Note from "./Note";
 import Footer from "./Footer";
 import CreateNote from "./CreateNote";
 import Message from "./Message";
 import Menu from "./Menu";
-import Ad from "./Ad";
+import Ad from "./Ad"; */
+import { useAuth } from "../contexts/AuthContext";
 
 import "../styles.css";
 
 const api_base = "http://localhost:3001";
 
 export default function App() {
-  const [notes, setNotes] = useState([]);
-  const [noteAdded, setNoteAdded] = useState(false);
+  //const [notes, setNotes] = useState([]);
+  // const [noteAdded, setNoteAdded] = useState(false);
+  //const { userInfo, setUserInfo, isAuthenticated, setIsAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
+
+  console.log(isAuthenticated);
+
+  useEffect(() => {
+    getUserInfo();
+  }, []);
+
+  const getUserInfo = async () => {
+    const response = await fetch(api_base + "/user");
+    const data = response.json();
+    //setUserInfo(data);
+    console.log(data);
+  };
 
   //triggers loadNotes
-  useEffect(() => {
+  /*useEffect(() => {
     loadNotes();
     setNoteAdded(true);
   }, [notes, noteAdded]);
 
   //load all notes
-  const loadNotes = async () => {
+ /* const loadNotes = async () => {
     await fetch(api_base + "/notes")
       .then((response) => {
         if (!response.ok) {
@@ -73,11 +89,11 @@ export default function App() {
     } catch (error) {
       console.error("Error:" + error);
     }
-  };
+  };*/
 
   return (
     <>
-      <CreateNote onAdd={addNote} isAdded={noteAdded} />
+      {/* <CreateNote onAdd={addNote} isAdded={noteAdded} />
       <div className="grid-container">
         <Header />
         <Menu />
@@ -102,7 +118,7 @@ export default function App() {
             ))
           )}
         </div>
-      </div>
+      </div>*/}
     </>
   );
 }

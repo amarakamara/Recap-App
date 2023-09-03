@@ -1,6 +1,5 @@
 import React from "react";
 import CloseIcon from "@mui/icons-material/Close";
-import Fab from "@mui/material/Fab";
 import Zoom from "@mui/material/Zoom";
 
 export default function CancelButton(props) {

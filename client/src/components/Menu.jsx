@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Routes, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
 import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark";
 import FavoriteIcon from "@mui/icons-material/Favorite";
