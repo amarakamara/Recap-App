@@ -4,17 +4,23 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import FavoriteOutlinedIcon from "@mui/icons-material/FavoriteOutlined";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import { useUser } from "../contexts/UserContext";
+import { useNote } from "../contexts/NoteContext";
+import deleteNote from "../utils/deleteNote";
 
 const api_base = "http://localhost:3001";
 
 function Note(props) {
+  const { userInfo } = useUser();
+  const { notes, setNotes } = useNote();
+
   const contentToDisplay =
     props.content.length >= 200
       ? props.content.substring(0, 50) + " "
       : props.content;
 
   function handleDelete() {
-    props.onDelete(props.id);
+    deleteNote(props.id, userInfo, notes, setNotes);
   }
 
   const toggleFavourites = async () => {

@@ -1,68 +1,86 @@
-import React, { /* useState*/ useEffect } from "react";
-/*import Header from "./Header";
+import React, { useState, useEffect } from "react";
+import Header from "./Header";
 import Note from "./Note";
 import Footer from "./Footer";
 import CreateNote from "./CreateNote";
 import Message from "./Message";
 import Menu from "./Menu";
-import Ad from "./Ad"; */
-import { useAuth } from "../contexts/AuthContext";
+import Ad from "./Ad";
+import { useUser } from "../contexts/UserContext";
+import { useNote } from "../contexts/NoteContext";
 
 import "../styles.css";
 
 const api_base = "http://localhost:3001";
 
 export default function App() {
-  //const [notes, setNotes] = useState([]);
-  // const [noteAdded, setNoteAdded] = useState(false);
-  //const { userInfo, setUserInfo, isAuthenticated, setIsAuthenticated } = useAuth();
-  const { isAuthenticated } = useAuth();
-
-  console.log(isAuthenticated);
+  const { notes, setNotes } = useNote();
+  const [noteAdded, setNoteAdded] = useState(false);
+  //const { isAuthenticated, setIsAuthenticated } = useAuth();
+  const { userInfo, setUserInfo, userID } = useUser();
+  const [userInfoFetched, setUserInfoFetched] = useState(false);
 
   useEffect(() => {
+    const getUserInfo = async () => {
+      if (!userID) {
+        return;
+      }
+      const response = await fetch(api_base + `/user/${userID}`, {
+        method: "GET",
+        credentials: "include",
+      });
+      const data = await response.json(); // Note: Added 'await' here
+      setUserInfo(data);
+      localStorage.setItem("userInfo", data);
+      setUserInfoFetched(true);
+    };
     getUserInfo();
-  }, []);
-
-  const getUserInfo = async () => {
-    const response = await fetch(api_base + "/user");
-    const data = response.json();
-    //setUserInfo(data);
-    console.log(data);
-  };
-
-  //triggers loadNotes
-  /*useEffect(() => {
-    loadNotes();
-    setNoteAdded(true);
-  }, [notes, noteAdded]);
+  }, [userID, setUserInfo]);
 
   //load all notes
- /* const loadNotes = async () => {
-    await fetch(api_base + "/notes")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network Error failed to fetch.");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setNotes(data);
-      })
-      .catch((error) => console.error("Error" + error.message));
-  };
+  useEffect(() => {
+    if (!userInfoFetched) {
+      return;
+    }
 
-  //Add note
-  const addNote = async (note) => {
+    loadNotes();
+    setNoteAdded(true);
+    // eslint-disable-next-line
+  }, [userInfo._id, notes, userInfoFetched, noteAdded]);
+
+  const loadNotes = async () => {
     try {
-      const response = await fetch(api_base + "/add", {
+      const response = await fetch(api_base + `/notes/${userInfo._id}`, {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("Network Error failed to fetch.");
+      }
+
+      const data = await response.json();
+      setNotes(data);
+    } catch (error) {
+      console.error("Error" + error.message);
+    }
+  };
+  //Add note
+  const addNote = async (note, userInfo) => {
+    if (!userInfoFetched) {
+      return;
+    }
+    try {
+      const response = await fetch(api_base + "/addnotes", {
         method: "POST",
         headers: {
           "content-type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({
           title: note.title,
           content: note.content,
+          userID: userID,
         }),
       });
 
@@ -75,25 +93,9 @@ export default function App() {
     }
   };
 
-  //delete Note
-  const deleteNote = async (id) => {
-    try {
-      const response = await fetch(api_base + "/delete/" + id, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        const deletedNote = await response.json();
-        setNotes(notes.filter((note) => note._id !== deletedNote._id));
-      }
-    } catch (error) {
-      console.error("Error:" + error);
-    }
-  };*/
-
   return (
     <>
-      {/* <CreateNote onAdd={addNote} isAdded={noteAdded} />
+      <CreateNote onAdd={addNote} isAdded={noteAdded} />
       <div className="grid-container">
         <Header />
         <Menu />
@@ -111,14 +113,13 @@ export default function App() {
                 id={note._id}
                 title={note.title}
                 content={note.content}
-                onDelete={deleteNote}
                 date={note.createdAt}
                 favourited={note.favourited}
               />
             ))
           )}
         </div>
-      </div>*/}
+      </div>
     </>
   );
 }

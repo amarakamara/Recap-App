@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { useUser } from "../contexts/UserContext";
 
 const api_base = "http://localhost:3001";
 
 export default function Login() {
-  const { isAuthenticated, setIsAuthenticated } = useAuth();
-  console.log(isAuthenticated);
-
+  const { setIsAuthenticated } = useAuth();
+  const { setUserID } = useUser();
   const [loginInfo, setLoginInfo] = useState({
     email: "",
     password: "",
@@ -37,9 +37,11 @@ export default function Login() {
     })
       .then((response) => response.json())
       .then((data) => {
-        if (data.user) {
-          setIsAuthenticated(true);
-          navigate("/home");
+        if (data.authenticated) {
+          setIsAuthenticated(data.authenticated);
+          setUserID(data.user._id);
+          localStorage.setItem("userID", data.user._id);
+          navigate("/home", { replace: true });
         } else {
           console.log("something happened");
         }

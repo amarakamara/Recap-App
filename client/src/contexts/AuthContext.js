@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
@@ -7,10 +7,19 @@ export function useAuth() {
 }
 
 export function AuthProvider(props) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userInfo, setUserInfo] = useState({});
+  // Check if there's an authentication state stored in localStorage
+  const initialIsAuthenticated =
+    localStorage.getItem("isAuthenticated") === "true";
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    initialIsAuthenticated
+  );
 
-  const values = { userInfo, setUserInfo, isAuthenticated, setIsAuthenticated };
+  // Use useEffect to update localStorage when isAuthenticated changes
+  useEffect(() => {
+    localStorage.setItem("isAuthenticated", isAuthenticated.toString());
+  }, [isAuthenticated]);
+
+  const values = { isAuthenticated, setIsAuthenticated };
 
   return (
     <AuthContext.Provider value={values}>{props.children}</AuthContext.Provider>

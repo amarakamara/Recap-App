@@ -9,7 +9,7 @@ export default function Menu() {
     <nav className="menu">
       <ul>
         <li>
-          <NavLink className="link-items" to="/">
+          <NavLink className="link-items" to="/home">
             <HomeIcon fontSize="large" />
           </NavLink>
         </li>

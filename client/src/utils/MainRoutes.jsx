@@ -17,9 +17,9 @@ export default function MainRoutes() {
       <Route element={<PrivateRoute />}>
         <Route path="/home" element={<App />} />
         <Route path="/collections" element={<Collections />} />
-        <Route path="/favourites" element={<Favourites />} />
         <Route path="/edit/:noteId" element={<EditNote />} />
         <Route path="/view/:noteId" element={<View />} />
+        <Route path="/favourites" element={<Favourites />} />
       </Route>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />

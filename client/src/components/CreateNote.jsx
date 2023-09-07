@@ -56,7 +56,7 @@ export default function CreateNote(props) {
     <>
       <div className="wrapper">
         {isExpanded && (
-          <form className="note-box" method="Post">
+          <form className="note-box" onSubmit={submitNote}>
             {message}
             <CancelButton click={close} />
             <input
@@ -73,7 +73,7 @@ export default function CreateNote(props) {
               placeholder="note.."
               value={note.content}
             />
-            <Button onClick={submitNote} variant="contained" size="small">
+            <Button type="submit" variant="contained" size="small">
               Add
             </Button>
           </form>

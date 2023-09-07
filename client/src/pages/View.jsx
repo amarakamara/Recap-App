@@ -4,20 +4,20 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Menu from "../components/Menu";
 import Ad from "../components/Ad";
+import { useNote } from "../contexts/NoteContext";
+import { useUser } from "../contexts/UserContext";
+
 import "../styles.css";
 const api_base = "http://localhost:3001";
 
 export default function View() {
+  const { userInfo } = useUser();
   const { noteId } = useParams();
-  const [notes, setNotes] = useState([]);
+  const { notes } = useNote();
   const [viewedNote, setViewedNote] = useState({
     title: "",
     content: "",
   });
-
-  useEffect(() => {
-    loadNotes();
-  }, [notes]);
 
   useEffect(() => {
     fetchData();
@@ -25,7 +25,13 @@ export default function View() {
 
   const fetchData = async () => {
     try {
-      const response = await fetch(api_base + `/view/${noteId}`);
+      const response = await fetch(
+        api_base + `/view/${noteId}/${userInfo._id}`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
       if (response.ok) {
         const data = await response.json();
         setViewedNote(data); // Update viewedNote
@@ -33,21 +39,6 @@ export default function View() {
     } catch (error) {
       console.error("Error fetching viewed note: " + error.message);
     }
-  };
-
-  //load all notes
-  const loadNotes = async () => {
-    await fetch(api_base + "/notes")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network Error failed to fetch.");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setNotes(data);
-      })
-      .catch((error) => console.error("Error" + error.message));
   };
 
   return (

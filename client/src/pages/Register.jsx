@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import Header from "../components/Header";
-
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { useUser } from "../contexts/UserContext";
 
 const api_base = "http://localhost:3001";
 
 export default function Register() {
-  const { isAuthenticated, setIsAuthenticated } = useAuth();
+  const { setIsAuthenticated } = useAuth();
+  const { setUserID } = useUser();
   const navigate = useNavigate();
-  console.log(isAuthenticated);
 
   const [registerInfo, setRegisterInfo] = useState({
     fName: "",
@@ -47,9 +47,10 @@ export default function Register() {
       .then((response) => response.json())
       .then((data) => {
         if (data.user) {
-          console.log(data.authenticated);
           setIsAuthenticated(data.authenticated);
-          navigate("/home");
+          setUserID(data.user._id);
+          localStorage.setItem("userID", data.user._id);
+          navigate("/home", { replace: true });
         } else {
           console.log("something happened");
         }

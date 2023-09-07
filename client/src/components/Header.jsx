@@ -1,17 +1,37 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import Logo from "./Logo";
 import CancelButton from "./CancelButton";
 import MenuIcon from "@mui/icons-material/Menu";
+//import { useUser } from "../contexts/UserContext";
+
+const api_base = "http://localhost:3001";
 
 export default function Header(props) {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+ // const { userID } = useUser();
+  const navigate = useNavigate();
 
   const openMenu = () => {
     setShowMobileMenu(true);
   };
   const closeMenu = () => {
     setShowMobileMenu(false);
+  };
+  const handleLogOut = async () => {
+    try {
+      const response = await fetch(api_base + "/logout", {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        localStorage.removeItem("userID");
+        localStorage.removeItem("userInfo");
+        navigate("/", { replace: true });
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -49,6 +69,7 @@ export default function Header(props) {
             <button onClick={openMenu}>
               <MenuIcon fontSize="large" />
             </button>
+            <button onClick={handleLogOut}>Log Out</button>
           </div>
         </div>
       </header>

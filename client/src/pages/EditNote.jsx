@@ -5,12 +5,16 @@ import Footer from "../components/Footer";
 import Menu from "../components/Menu";
 import Ad from "../components/Ad";
 import Button from "@mui/material/Button";
+import { useNote } from "../contexts/NoteContext";
+import { useUser } from "../contexts/UserContext";
+
 import "../styles.css";
 const api_base = "http://localhost:3001";
 
 export default function EditNote() {
+  const { userID } = useUser();
   const { noteId } = useParams();
-  const [notes, setNotes] = useState([]);
+  const { notes } = useNote();
   const [noteData, setNoteData] = useState({
     title: "",
     content: "",
@@ -18,47 +22,32 @@ export default function EditNote() {
   const [updateSuccess, setSuccess] = useState(false);
 
   useEffect(() => {
+    const noteEdited = async (noteId) => {
+      const response = await fetch(api_base + `/edit/${noteId}/${userID}`, {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("Network Error failed to fetch.");
+      }
+      const data = response.json();
+      return data;
+    };
+
     noteEdited(noteId)
       .then((data) => {
         setNoteData(data);
       })
       .catch((err) => console.error(err));
-  }, [noteId]);
-
-  useEffect(() => {
-    loadNotes();
-  }, [notes]);
-
-  const noteEdited = async (noteId) => {
-    const response = await fetch(api_base + `/edit/${noteId}`);
-
-    if (!response.ok) {
-      throw new Error("Network Error failed to fetch.");
-    }
-    const data = response.json();
-    return data;
-  };
-
-  //load all notes
-  const loadNotes = async () => {
-    await fetch(api_base + "/notes")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network Error failed to fetch.");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setNotes(data);
-      })
-      .catch((error) => console.error("Error" + error.message));
-  };
+  }, [noteId, userID]);
 
   const handleClick = async (event) => {
     event.preventDefault();
     try {
-      await fetch(api_base + `/edit/${noteId}`, {
+      await fetch(api_base + `/edit/${noteId}/${userID}`, {
         method: "PUT",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -107,7 +96,7 @@ export default function EditNote() {
           </form>
         </div>
       </div>
-      {updateSuccess && <Navigate to="/" replace={true} />}
+      {updateSuccess && <Navigate to="/home" replace={true} />}
     </>
   );
 }

@@ -1,14 +1,19 @@
 /***Imports */
 import dotenv from "dotenv";
 dotenv.config();
+import { ObjectId } from "mongodb";
 import express from "express";
 import mongoose from "mongoose";
 import session from "express-session";
 import passport from "passport";
 import passportLocalMongoose from "passport-local-mongoose";
 import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
+import sessionFileStore from "session-file-store";
 import logger from "morgan";
 import cors from "cors";
+
+const FileStore = sessionFileStore(session);
 
 const app = express();
 
@@ -22,13 +27,23 @@ mongoose
 
 /*****Middlewares*****/
 app.use(express.json());
-app.use(cors);
+const options = {
+  origin: "http://localhost:3000",
+  methods: ["GET", "POST", "PUT", "DELETE", "UPDATE"],
+  credentials: true,
+};
+app.use(cors(options));
 app.use(logger("combined"));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(cookieParser(process.env.SESSION_SECRET));
 app.use(
   session({
+    store: new FileStore(),
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
+    cookie: { secure: false },
   })
 );
 
@@ -45,6 +60,22 @@ passport.use(User.createStrategy());
 
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
+
+//Auth Middlewares
+function ensureAuthenticated(req, res, next) {
+  if (req.user) {
+    return next();
+  }
+  res.status(401).json({ message: "User is not authenticated" });
+}
+
+function validateObjectId(id) {
+  if (ObjectId.isValid(id)) {
+    return true;
+  } else {
+    return false;
+  }
+}
 
 /****   Routes **** */
 
@@ -78,48 +109,60 @@ app.post("/register", (req, res) => {
 
 //Login
 app.post("/login", passport.authenticate("local"), (req, res) => {
-  console.log(req.user);
-  res
-    .status(200)
-    .json({ message: "Login successful", user: req.user, authenticated: true });
+  res.status(200).json({
+    message: "Login successful",
+    user: req.user,
+    authenticated: true,
+  });
 });
 
+//logout
+app.post("/logout", (req, res, next) => {
+  req.logout(function (err) {
+    if (err) {
+      return next(err);
+    }
+    res.status(200).json({ message: "Logged out succesfully" });
+  });
+});
 /**** get user*/
 // get user
-app.get(
-  "/user",
-  /*ensureAuthenticated,*/ (req, res) => {
-    console.log(req.user);
-    const userInfo = req.user;
-    res.json(userInfo);
-  }
-);
-
-/*
-const pingMessage = {
-  message: "HI",
-};
-
-app.post("/ping", async (req, res) => {
-  await (pingMessage.message = req.body.message);
-  res.json();
-});
-
-/*
-//returns the notes
-app.get("/notes", async (req, res) => {
-  const response = await Note.find();
+app.get("/user/:id", ensureAuthenticated, async (req, res) => {
+  const userId = req.params.id;
+  const id = new ObjectId(userId);
+  const response = await User.findOne({ _id: id });
   res.json(response);
 });
 
+//returns the notes
+app.get("/notes/:uid", ensureAuthenticated, async (req, res) => {
+  const uid = new ObjectId(req.params.uid);
+
+  if (validateObjectId(uid)) {
+    await Note.find({ user: uid })
+      .then((foundNotes) => {
+        if (foundNotes) {
+          res.json(foundNotes);
+        } else if (!foundNotes) {
+          res.json({ message: "No notes found" });
+        }
+      })
+      .catch((err) => console.error(err));
+  } else {
+    console.log("Invalid Id String");
+  }
+});
+
 //saves a new note
-app.post("/add", async (req, res) => {
+app.post("/addnotes", ensureAuthenticated, async (req, res) => {
   const title = req.body.title;
   const content = req.body.content;
+  const user = req.body.userID;
 
   const note = new Note({
     title: title,
     content: content,
+    user: user,
   });
 
   await note.save().then(() => {
@@ -128,47 +171,80 @@ app.post("/add", async (req, res) => {
 });
 
 //deletes a note
-app.delete("/delete/:id", async (req, res) => {
-  const id = req.params.id;
-  await Note.findByIdAndRemove(id).then(() => {
-    console.log("item deleted");
-  });
+app.delete("/delete/:nid/:uid", ensureAuthenticated, async (req, res) => {
+  const uid = new ObjectId(req.params.uid);
+  const nid = new ObjectId(req.params.nid);
+
+  if (validateObjectId(uid) && validateObjectId(nid)) {
+    await Note.findOneAndRemove({ _id: nid, user: uid }).then((deletedNote) => {
+      if (deletedNote) {
+        console.log("item deleted");
+      } else {
+        console.log("No note found or deleted");
+      }
+    });
+  } else {
+    console.log("Invalid Id String");
+  }
 });
 
-app.get("/edit/:id", async (req, res) => {
-  const id = req.params.id;
-  const editedNote = await Note.findById({ _id: id });
-  res.json(editedNote);
+app.get("/edit/:nid/:uid", async (req, res) => {
+  const nid = new ObjectId(req.params.nid);
+  const uid = new ObjectId(req.params.uid);
+
+  if (validateObjectId(uid) && validateObjectId(nid)) {
+    const editedNote = await Note.findOne({ _id: nid, user: uid });
+    res.json(editedNote);
+  } else {
+    console.log("Invalid Id String");
+  }
 });
 
-app.put("/edit/:id", async (req, res) => {
-  const id = req.params.id;
+app.put("/edit/:nid/:uid", async (req, res) => {
+  const uid = new ObjectId(req.params.uid);
+  const nid = new ObjectId(req.params.nid);
   const title = req.body.title;
   const content = req.body.content;
 
-  await Note.findByIdAndUpdate({ _id: id }, { title: title, content: content });
-  res.json({ message: "Note updated" });
+  if (validateObjectId(uid) && validateObjectId(nid)) {
+    await Note.findOneAndUpdate(
+      { _id: nid, user: uid },
+      { title: title, content: content }
+    );
+    res.json({ message: "Note updated" });
+  } else {
+    console.log("Invalid Id String");
+  }
 });
 
-app.get("/view/:id", async (req, res) => {
-  const id = req.params.id;
-  const response = await Note.findById({ _id: id });
-  res.json(response);
+app.get("/view/:nid/:uid", async (req, res) => {
+  const uid = new ObjectId(req.params.uid);
+  const nid = new ObjectId(req.params.nid);
+
+  if (validateObjectId(uid) && validateObjectId(nid)) {
+    const response = await Note.findOne({ _id: nid, user: uid });
+    res.json(response);
+  } else {
+    console.log("Invalid Id String");
+  }
 });
 
+/*
 //Update favourite note
 
-app.get("/favourites", async (req, res) => {
-  const response = await Note.find({ favourited: true });
+app.get("/favourites:uid", async (req, res) => {
+    const uid = new ObjectId(req.params.uid);
+  const response = await Note.find({user:uid , favourited: true });
   res.json(response);
 });
 
-app.put("/toggleFavourites/:id", async (req, res) => {
-  const id = req.params.id;
+app.put("/toggleFavourites/:nid/:uid", async (req, res) => {
+  const uid = new ObjectId(req.params.uid);
+  const nid = new ObjectId(req.params.nid);
   try {
-    const note = await Note.findByIdAndUpdate({ _id: id });
-
-    if (note.favourited) {
+    await Note.findOneAndUpdate({ _id: nid, user:uid  }).then((foundNote)=>{
+       if(foundNote){
+  if (note.favourited) {
       note.favourited = false;
       await note.save();
     } else {
@@ -176,17 +252,14 @@ app.put("/toggleFavourites/:id", async (req, res) => {
       await note.save();
     }
     console.log("Update Done on favourites!");
+       }else{
+        console.log("Couldn't find a note with that Id")
+       }
+    });
   } catch (error) {
     console.error("Error" + error.message);
   }
 });*/
-
-function ensureAuthenticated(req, res, next) {
-  if (req.user) {
-    return next();
-  }
-  res.status(401).json({ message: "User is not authenticated" });
-}
 
 app.listen(3001, () => {
   console.log("Server started on port 3001");
