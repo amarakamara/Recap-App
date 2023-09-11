@@ -4,25 +4,22 @@ import Button from "@mui/material/Button";
 import CancelButton from "./CancelButton";
 import { useNote } from "../contexts/NoteContext";
 import { useUser } from "../contexts/UserContext";
-import addNote from "../apis/addNotes";
+import addCollection from "../apis/addCollection";
 
-export default function CreateNote(props) {
-  const { notes, setNotes, setNotesUpdated } = useNote();
+export default function CreateNote() {
+  const { setCollectionUpdated, collections, setCollections } = useNote();
   const { userInfo } = useUser();
-  const [note, setNote] = useState({
-    title: "",
-    content: "",
-  });
+  const [collectionName, setCollectionName] = useState("");
 
   const [isAdded, setIsAdded] = useState(false);
-  const prevNotesLengthRef = useRef(notes.length);
+  const prevCollectionsLengthRef = useRef(collections.length);
 
   useEffect(() => {
-    if (notes.length > prevNotesLengthRef.current) {
+    if (collections.length > prevCollectionsLengthRef.current) {
       setIsAdded(true);
-      prevNotesLengthRef.current = notes.length;
+      prevCollectionsLengthRef.current = collections.length;
     }
-  }, [notes]);
+  }, [collections]);
 
   const [isExpanded, setExpand] = useState(false);
   const [message, setMessage] = useState(null);
@@ -42,25 +39,21 @@ export default function CreateNote(props) {
     }
   }
 
-  function submitNote(event) {
-    addNote(userInfo, setNotes, note);
-    setNotesUpdated(true);
-    setNote({
-      title: "",
-      content: "",
-    });
+  function submitCollection(event) {
+    addCollection(userInfo, setCollections, collectionName);
+    setCollectionUpdated(true);
+    setCollectionName("");
     renderMessage();
     event.preventDefault();
   }
 
-  function handleChange(event) {
-    const { name, value } = event.target;
-
-    setNote((prevValue) => ({
+  /*function handleChange(event) {
+    const value = event.target.value;
+    setCollectionName((prevValue) => ({
       ...prevValue,
-      [name]: value,
+      name: value,
     }));
-  }
+  }*/
 
   function expand() {
     setExpand(true);
@@ -74,22 +67,15 @@ export default function CreateNote(props) {
     <>
       <div className="wrapper">
         {isExpanded && (
-          <form className="note-box" onSubmit={submitNote}>
+          <form className="note-box" onSubmit={submitCollection}>
             {message}
             <CancelButton click={close} />
             <input
-              onChange={handleChange}
-              name="title"
+              onChange={(e) => setCollectionName(e.target.value)}
+              name="name"
               type="text"
-              placeholder="title"
-              value={note.title}
-            />
-            <textarea
-              rows="3"
-              onChange={handleChange}
-              name="content"
-              placeholder="note.."
-              value={note.content}
+              placeholder="colleciton name"
+              value={collectionName}
             />
             <Button type="submit" variant="contained" size="small">
               Add

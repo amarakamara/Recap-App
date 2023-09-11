@@ -128,10 +128,14 @@ app.post("/logout", (req, res, next) => {
 /**** get user*/
 // get user
 app.get("/user/:id", ensureAuthenticated, async (req, res) => {
-  const userId = req.params.id;
-  const id = new ObjectId(userId);
-  const response = await User.findOne({ _id: id });
-  res.json(response);
+  const id = new ObjectId(req.params.id);
+
+  if (validateObjectId(id)) {
+    const response = await User.findOne({ _id: id });
+    res.json(response);
+  } else {
+    console.log("Invalid Id String");
+  }
 });
 
 //returns the notes
@@ -153,7 +157,7 @@ app.get("/notes/:uid", ensureAuthenticated, async (req, res) => {
   }
 });
 
-//saves a new note
+//creates a new note
 app.post("/addnotes", ensureAuthenticated, async (req, res) => {
   const title = req.body.title;
   const content = req.body.content;
@@ -188,7 +192,8 @@ app.delete("/delete/:nid/:uid", ensureAuthenticated, async (req, res) => {
   }
 });
 
-app.get("/edit/:nid/:uid", async (req, res) => {
+//Edit a note
+app.get("/edit/:nid/:uid", ensureAuthenticated, async (req, res) => {
   const nid = new ObjectId(req.params.nid);
   const uid = new ObjectId(req.params.uid);
 
@@ -200,7 +205,7 @@ app.get("/edit/:nid/:uid", async (req, res) => {
   }
 });
 
-app.put("/edit/:nid/:uid", async (req, res) => {
+app.put("/edit/:nid/:uid", ensureAuthenticated, async (req, res) => {
   const uid = new ObjectId(req.params.uid);
   const nid = new ObjectId(req.params.nid);
   const title = req.body.title;
@@ -217,7 +222,7 @@ app.put("/edit/:nid/:uid", async (req, res) => {
   }
 });
 
-app.get("/view/:nid/:uid", async (req, res) => {
+app.get("/view/:nid/:uid", ensureAuthenticated, async (req, res) => {
   const uid = new ObjectId(req.params.uid);
   const nid = new ObjectId(req.params.nid);
 
@@ -229,37 +234,69 @@ app.get("/view/:nid/:uid", async (req, res) => {
   }
 });
 
-/*
-//Update favourite note
+//get favourite notes
 
-app.get("/favourites:uid", async (req, res) => {
-    const uid = new ObjectId(req.params.uid);
-  const response = await Note.find({user:uid , favourited: true });
-  res.json(response);
+app.get("/favourites/:uid", ensureAuthenticated, async (req, res) => {
+  const uid = new ObjectId(req.params.uid);
+  if (validateObjectId(uid)) {
+    const response = await Note.find({ user: uid, favourited: true });
+    res.json(response);
+  } else {
+    console.log("Invalid Id String");
+  }
 });
 
-app.put("/toggleFavourites/:nid/:uid", async (req, res) => {
-  const uid = new ObjectId(req.params.uid);
-  const nid = new ObjectId(req.params.nid);
-  try {
-    await Note.findOneAndUpdate({ _id: nid, user:uid  }).then((foundNote)=>{
-       if(foundNote){
-  if (note.favourited) {
-      note.favourited = false;
-      await note.save();
+//update favourite notes
+app.put(
+  "/toggleFavourites/:nid/:uid",
+  ensureAuthenticated,
+  async (req, res) => {
+    const uid = new ObjectId(req.params.uid);
+    const nid = new ObjectId(req.params.nid);
+
+    if (validateObjectId(uid) && validateObjectId(nid)) {
+      try {
+        const foundNote = await Note.findOne({ _id: nid, user: uid });
+        if (foundNote) {
+          foundNote.favourited = !foundNote.favourited;
+          await foundNote.save();
+          res.status(200).json({ message: "Toggle done." });
+        } else {
+          console.log("Couldn't find a note with that Id");
+        }
+      } catch (error) {
+        console.error("Error: " + error.message);
+      }
     } else {
-      note.favourited = true;
-      await note.save();
+      console.log("Invalid Id String");
     }
-    console.log("Update Done on favourites!");
-       }else{
-        console.log("Couldn't find a note with that Id")
-       }
-    });
-  } catch (error) {
-    console.error("Error" + error.message);
   }
-});*/
+);
+
+//get all the user collections
+
+app.get("/collections/:uid", ensureAuthenticated, async (req, res) => {
+  const uid = new ObjectId(req.params.uid);
+  if (validateObjectId(uid)) {
+    const response = await Collection.find({ user: uid });
+    res.json(response);
+  } else {
+    console.log("Invalid Id String");
+  }
+});
+
+//create collection
+app.post("/createCollection", ensureAuthenticated, async (req, res) => {
+  const collectionName = req.body.name;
+  const uid = req.body.userID;
+  const collection = new Collection({
+    name: collectionName,
+    user: uid,
+  });
+  await collection.save().then(() => {
+    console.log("new collection saved");
+  });
+});
 
 app.listen(3001, () => {
   console.log("Server started on port 3001");

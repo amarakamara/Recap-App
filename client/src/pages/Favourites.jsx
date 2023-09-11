@@ -1,37 +1,54 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Menu from "../components/Menu";
 import Ad from "../components/Ad";
 import Note from "../components/Note";
 import { useNote } from "../contexts/NoteContext";
-
+import { useUser } from "../contexts/UserContext";
 import "../styles.css";
+
 const api_base = "http://localhost:3001";
 
 export default function Favourites() {
-  const { notes } = useNote();
-  const [favourites, setFavourites] = useState([]);
+  const { userInfo } = useUser();
+  console.log(userInfo);
+  const {
+    notes,
+    favouriteNotes,
+    setFavouriteNotes,
+    updateFavourites,
+    setUpdateFavourites,
+  } = useNote();
 
   //triggers loadNotes
   useEffect(() => {
+    if (!userInfo) {
+      return;
+    }
+    const loadFavourites = async () => {
+      await fetch(api_base + `/favourites/${userInfo._id}`, {
+        method: "GET",
+        credentials: "include",
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Network Error failed to fetch.");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          setFavouriteNotes(data);
+          setUpdateFavourites(false);
+        })
+        .catch((error) => console.error("Error" + error.message));
+    };
+
     loadFavourites();
-  }, [favourites]);
+    // eslint-disable-next-line
+  }, [userInfo, updateFavourites, setFavouriteNotes]);
 
   //load all favourite notes
-  const loadFavourites = async () => {
-    await fetch(api_base + "/favourites")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network Error failed to fetch.");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setFavourites(data);
-      })
-      .catch((error) => console.error("Error" + error.message));
-  };
 
   return (
     <>
@@ -41,11 +58,11 @@ export default function Favourites() {
         <Ad notes={notes} />
         <Footer />
         <div className="container">
-          {notes.length === 0 ? (
+          {favouriteNotes.length === 0 ? (
             <h2 className="message">You don't have any favourites yet.</h2>
           ) : (
-            favourites &&
-            favourites.map((note) => (
+            favouriteNotes &&
+            favouriteNotes.map((note) => (
               <Note
                 key={note._id}
                 id={note._id}

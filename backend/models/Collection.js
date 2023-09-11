@@ -16,6 +16,18 @@ const collectionSchema = new Schema({
       ref: "Note",
     },
   ],
+  createdAt: {
+    type: String,
+    immutable: true,
+    default: () => {
+      let currentDate = new Date();
+      let day = currentDate.getDate();
+      let month = currentDate.getMonth() + 1;
+      let year = currentDate.getFullYear();
+      const date = day + "/" + month + "/" + year;
+      return date;
+    },
+  },
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

@@ -6,14 +6,13 @@ import FavoriteOutlinedIcon from "@mui/icons-material/FavoriteOutlined";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { useUser } from "../contexts/UserContext";
 import { useNote } from "../contexts/NoteContext";
-import deleteNote from "../utils/deleteNote";
+import deleteNote from "../apis/deleteNote";
 
 const api_base = "http://localhost:3001";
 
 function Note(props) {
   const { userInfo } = useUser();
-  const { notes, setNotes } = useNote();
-
+  const { notes, setNotes, setNotesUpdated, setUpdateFavourites } = useNote();
   const contentToDisplay =
     props.content.length >= 200
       ? props.content.substring(0, 50) + " "
@@ -21,13 +20,17 @@ function Note(props) {
 
   function handleDelete() {
     deleteNote(props.id, userInfo, notes, setNotes);
+    setNotesUpdated(true);
   }
 
   const toggleFavourites = async () => {
     try {
-      await fetch(api_base + `/toggleFavourites/${props.id}`, {
+      await fetch(api_base + `/toggleFavourites/${props.id}/${userInfo._id}`, {
         method: "PUT",
+        credentials: "include",
       });
+      setNotesUpdated(true);
+      setUpdateFavourites(true);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -44,6 +47,7 @@ function Note(props) {
       </div>
       <div className="note-meta">
         <p>Created: {props.date}</p>
+
         <div className="note-tools">
           <button className="favourite-btn" onClick={toggleFavourites}>
             {props.favourited ? (

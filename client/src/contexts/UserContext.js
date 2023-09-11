@@ -15,8 +15,11 @@ export function UserInfoProvider(props) {
 
   useEffect(() => {
     localStorage.setItem("userID", userID);
+  }, [userID]);
+
+  useEffect(() => {
     localStorage.setItem("userInfo", userInfo);
-  }, [userID, userInfo]);
+  }, [userInfo]);
 
   const values = { userInfo, setUserInfo, userID, setUserID };
   return (
