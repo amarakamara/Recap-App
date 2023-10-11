@@ -1,22 +1,42 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation, useParams } from "react-router-dom";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import FavoriteOutlinedIcon from "@mui/icons-material/FavoriteOutlined";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import CancelButton from "./CancelButton";
 import { useUser } from "../contexts/UserContext";
 import { useNote } from "../contexts/NoteContext";
 import deleteNote from "../apis/deleteNote";
+import deleteFromCollection from "../apis/deleteFromCollection";
 
 const api_base = "http://localhost:3001";
 
 function Note(props) {
+  const location = useLocation();
+  const currentPath = location.pathname;
+  const { collectionId } = useParams();
   const { userInfo } = useUser();
-  const { notes, setNotes, setNotesUpdated, setUpdateFavourites } = useNote();
+
+  const {
+    setCollectionNotesUpdated,
+    setShowCollectionPane,
+    notes,
+    setNotes,
+    setNotesUpdated,
+    setUpdateFavourites,
+    setNoteId,
+  } = useNote();
+
   const contentToDisplay =
     props.content.length >= 200
       ? props.content.substring(0, 50) + " "
       : props.content;
+
+  function openCollectionPane() {
+    setNoteId(props.id);
+    setShowCollectionPane(true);
+  }
 
   function handleDelete() {
     deleteNote(props.id, userInfo, notes, setNotes);
@@ -35,9 +55,17 @@ function Note(props) {
       console.error("Error:", error);
     }
   };
+  function handleRemove() {
+    deleteFromCollection(collectionId, props.id, userInfo._id);
+    setCollectionNotesUpdated(true);
+  }
 
   return (
     <div className="note">
+      <button onClick={openCollectionPane}> atc</button>
+      {currentPath.startsWith("/view-collection") && (
+        <CancelButton click={handleRemove} />
+      )}
       <div>
         <h1>{props.title}</h1>
         <p>{contentToDisplay}</p>

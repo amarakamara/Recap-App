@@ -4,37 +4,42 @@ import User from "./user.js";
 
 const Schema = mongoose.Schema;
 
-const noteSchema = new Schema({
-  title: {
-    type: String,
-    required: true,
-  },
-  content: String,
-  createdAt: {
-    type: String,
-    immutable: true,
-    default: () => {
-      let currentDate = new Date();
-      let day = currentDate.getDate();
-      let month = currentDate.getMonth() + 1;
-      let year = currentDate.getFullYear();
-      const date = day + "/" + month + "/" + year;
-      return date;
+const noteSchema = new Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+    },
+    content: String,
+    createdAt: {
+      type: String,
+      immutable: true,
+      default: () => {
+        let currentDate = new Date();
+        let day = currentDate.getDate();
+        let month = currentDate.getMonth() + 1;
+        let year = currentDate.getFullYear();
+        const date = day + "/" + month + "/" + year;
+        return date;
+      },
+    },
+    favourited: {
+      type: Boolean,
+      default: false,
+    },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
   },
-  favourited: {
-    type: Boolean,
-    default: false,
-  },
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-});
+  {
+    autoIndex: false,
+  }
+);
 
 noteSchema.plugin(passportLocalMongoose);
 
-const Note = mongoose.model("note", noteSchema);
+const Note = mongoose.model("Note", noteSchema);
 
 export default Note;

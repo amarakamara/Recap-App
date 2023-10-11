@@ -5,34 +5,40 @@ import User from "./user.js";
 
 const Schema = mongoose.Schema;
 
-const collectionSchema = new Schema({
-  name: {
-    type: String,
-    required: true,
-  },
-  notes: [
-    {
+const collectionSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    notes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Note",
+      },
+    ],
+    createdAt: {
+      type: String,
+      immutable: true,
+      default: () => {
+        let currentDate = new Date();
+        let day = currentDate.getDate();
+        let month = currentDate.getMonth() + 1;
+        let year = currentDate.getFullYear();
+        const date = day + "/" + month + "/" + year;
+        return date;
+      },
+    },
+    image: String,
+    user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Note",
-    },
-  ],
-  createdAt: {
-    type: String,
-    immutable: true,
-    default: () => {
-      let currentDate = new Date();
-      let day = currentDate.getDate();
-      let month = currentDate.getMonth() + 1;
-      let year = currentDate.getFullYear();
-      const date = day + "/" + month + "/" + year;
-      return date;
+      ref: "User",
     },
   },
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-  },
-});
+  {
+    autoIndex: false, // Disable automatic index creation for this collection
+  }
+);
 
 collectionSchema.plugin(passportLocalMongoose);
 

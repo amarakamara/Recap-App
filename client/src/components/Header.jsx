@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import Logo from "./Logo";
 import CancelButton from "./CancelButton";
 import MenuIcon from "@mui/icons-material/Menu";
 //import { useUser } from "../contexts/UserContext";
@@ -9,7 +8,7 @@ const api_base = "http://localhost:3001";
 
 export default function Header(props) {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
- // const { userID } = useUser();
+  // const { userID } = useUser();
   const navigate = useNavigate();
 
   const openMenu = () => {
@@ -25,8 +24,7 @@ export default function Header(props) {
       });
 
       if (response.ok) {
-        localStorage.removeItem("userID");
-        localStorage.removeItem("userInfo");
+        localStorage.clear();
         navigate("/", { replace: true });
       }
     } catch (error) {
@@ -43,7 +41,7 @@ export default function Header(props) {
           </div>
           <ul>
             <li>
-              <NavLink className="link-mobile" to="/">
+              <NavLink className="link-mobile" to="/home">
                 Home
               </NavLink>
             </li>
@@ -63,7 +61,7 @@ export default function Header(props) {
       <header>
         <div className="header-inner">
           <div className="logo-div">
-            <Logo />
+            <img className="logo-img" src="assets/logoPng.png" alt="logo" />;
           </div>
           <div className="btn-div">
             <button onClick={openMenu}>

@@ -12,6 +12,7 @@ import cookieParser from "cookie-parser";
 import sessionFileStore from "session-file-store";
 import logger from "morgan";
 import cors from "cors";
+import { stringify, parse } from "flatted";
 
 const FileStore = sessionFileStore(session);
 
@@ -29,7 +30,7 @@ mongoose
 app.use(express.json());
 const options = {
   origin: "http://localhost:3000",
-  methods: ["GET", "POST", "PUT", "DELETE", "UPDATE"],
+  methods: ["GET", "POST", "PUT", "DELETE", "UPDATE", "PATCH"],
   credentials: true,
 };
 app.use(cors(options));
@@ -43,7 +44,9 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false },
+    cookie: {
+      secure: false,
+    },
   })
 );
 
@@ -79,41 +82,77 @@ function validateObjectId(id) {
 
 /****   Routes **** */
 
-//register
 app.post("/register", (req, res) => {
-  const newUser = {
-    username: req.body.username,
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-  };
+  User.findOne({ username: req.body.username })
+    .then((existingUser) => {
+      if (existingUser) {
+        return res.status(409).json({
+          message: "Username already exists. Login Instead.",
+          authenticated: false,
+        });
+      }
 
-  User.register(newUser, req.body.password, (err, user) => {
-    if (err) {
+      const newUser = {
+        username: req.body.username,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+      };
+
+      User.register(newUser, req.body.password, (err, user) => {
+        if (err) {
+          console.error(err);
+          return res.status(400).json({
+            message: "Registration failed",
+            authenticated: false,
+          });
+        }
+        passport.authenticate("local")(req, res, () => {
+          res.status(201).json({
+            message: "Registration successful",
+            user: req.user,
+            authenticated: true,
+          });
+        });
+      });
+    })
+    .catch((err) => {
       console.error(err);
-      return res.status(400).json({
-        success: false,
-        message: "Registration failed",
+      return res.status(500).json({
+        message: "something went wrong, try again",
         authenticated: false,
       });
-    }
-    passport.authenticate("local")(req, res, () => {
-      res.status(201).json({
-        success: true,
-        message: "Registration successful",
-        user: req.user,
-        authenticated: true,
-      });
     });
-  });
 });
 
 //Login
-app.post("/login", passport.authenticate("local"), (req, res) => {
-  res.status(200).json({
-    message: "Login successful",
-    user: req.user,
-    authenticated: true,
-  });
+app.post("/login", (req, res, next) => {
+  passport.authenticate("local", (err, user, info) => {
+    if (err) {
+      return res.status(500).json({
+        message: "Something went wrong, try again.",
+        authenticated: false,
+      });
+    }
+
+    if (!user) {
+      return res.status(403).json({
+        message: "Wrong username or password.",
+        authenticated: false,
+      });
+    }
+
+    // You can perform additional actions upon successful login here
+    req.login(user, (loginErr) => {
+      if (loginErr) {
+        return next(loginErr);
+      }
+      return res.status(200).json({
+        message: "Login successful",
+        user: user,
+        authenticated: true,
+      });
+    });
+  })(req, res, next);
 });
 
 //logout
@@ -175,7 +214,7 @@ app.post("/addnotes", ensureAuthenticated, async (req, res) => {
 });
 
 //deletes a note
-app.delete("/delete/:nid/:uid", ensureAuthenticated, async (req, res) => {
+app.delete("/note/delete/:nid/:uid", ensureAuthenticated, async (req, res) => {
   const uid = new ObjectId(req.params.uid);
   const nid = new ObjectId(req.params.nid);
 
@@ -216,7 +255,7 @@ app.put("/edit/:nid/:uid", ensureAuthenticated, async (req, res) => {
       { _id: nid, user: uid },
       { title: title, content: content }
     );
-    res.json({ message: "Note updated" });
+    res.send(flatted.stringify(collection));
   } else {
     console.log("Invalid Id String");
   }
@@ -273,6 +312,8 @@ app.put(
   }
 );
 
+/******  COLLECTION ***** */
+
 //get all the user collections
 
 app.get("/collections/:uid", ensureAuthenticated, async (req, res) => {
@@ -285,19 +326,162 @@ app.get("/collections/:uid", ensureAuthenticated, async (req, res) => {
   }
 });
 
+//add note to collection
+app.patch(
+  "/collection/addnotes/:cid/:uid",
+  ensureAuthenticated,
+  async (req, res) => {
+    const cid = new ObjectId(req.params.cid);
+    const uid = new ObjectId(req.params.uid);
+    const nid = new ObjectId(req.body.noteId);
+
+    if (
+      validateObjectId(uid) &&
+      validateObjectId(cid) &&
+      validateObjectId(nid)
+    ) {
+      await Collection.findOneAndUpdate(
+        { _id: cid, user: uid },
+        { $addToSet: { notes: nid } }
+      );
+      res.status(200).json();
+      console.log("note added to collection");
+    } else {
+      console.log("Invalid Id String");
+    }
+  }
+);
+
+//delete note from collection
+app.patch(
+  "/collection/deletenote/:cid/:uid",
+  ensureAuthenticated,
+  async (req, res) => {
+    const cid = new ObjectId(req.params.cid);
+    const uid = new ObjectId(req.params.uid);
+    const nid = new ObjectId(req.body.noteId);
+
+    if (
+      validateObjectId(uid) &&
+      validateObjectId(cid) &&
+      validateObjectId(nid)
+    ) {
+      await Collection.findOneAndUpdate(
+        { _id: cid, user: uid },
+        { $pull: { notes: nid } }
+      );
+      res.status(200).json();
+      console.log("note added to collection");
+    } else {
+      console.log("Invalid Id String");
+    }
+  }
+);
+
+//get all notes in a collection
+
+app.get("/view-collection/:cid/:uid", ensureAuthenticated, async (req, res) => {
+  try {
+    const cid = new ObjectId(req.params.cid);
+    const uid = new ObjectId(req.params.uid);
+
+    if (!validateObjectId(uid) || !validateObjectId(cid)) {
+      console.log("Invalid ID String");
+      res.status(400).json({ error: "Invalid ID String" });
+      return;
+    }
+
+    const collection = await Collection.findOne({
+      _id: cid,
+      user: uid,
+    }).populate("notes");
+
+    if (!collection) {
+      console.log("Collection not found");
+      res.status(404).json({ error: "Collection not found" });
+      return;
+    }
+
+    res.send(stringify(collection));
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 //create collection
 app.post("/createCollection", ensureAuthenticated, async (req, res) => {
   const collectionName = req.body.name;
-  const uid = req.body.userID;
-  const collection = new Collection({
-    name: collectionName,
-    user: uid,
-  });
-  await collection.save().then(() => {
-    console.log("new collection saved");
-  });
+  const uid = new ObjectId(req.body.userID);
+  const imageUrl = req.body.imageUrl;
+
+  if (validateObjectId(uid)) {
+    const collection = new Collection({
+      name: collectionName,
+      user: uid,
+      image: imageUrl,
+    });
+    await collection.save().then(() => {
+      console.log("new collection saved");
+    });
+  } else {
+    console.log("Invalid Id String");
+  }
 });
 
+//delete collection
+app.delete(
+  "/collection/delete/:cid/:uid",
+  ensureAuthenticated,
+  async (req, res) => {
+    const uid = new ObjectId(req.params.uid);
+    const cid = new ObjectId(req.params.cid);
+
+    if (validateObjectId(uid) && validateObjectId(cid)) {
+      await Collection.findOneAndRemove({ _id: cid, user: uid }).then(
+        (deletedCollection) => {
+          if (deletedCollection) {
+            console.log("collection deleted");
+          } else {
+            console.log("No collection found or deleted");
+          }
+        }
+      );
+    } else {
+      console.log("Invalid Id String");
+    }
+  }
+);
+
+//get random unsplash image for collection
+const clientId = process.env.UNSPLASH_CLIENT_ID;
+const unsplashRoot = "https://api.unsplash.com";
+
+app.get("/randomImage/:query", async (req, res) => {
+  const query = req.params.query;
+
+  try {
+    const response = await fetch(
+      `${unsplashRoot}/photos/random?query=${query}&client_id=${clientId}`,
+      {
+        method: "GET",
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch photo data from Unsplash.");
+    }
+    const photoData = await response.json();
+    res.json(photoData.urls.regular);
+  } catch (error) {
+    console.error("Error:", error.message);
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching the image." });
+  }
+});
+
+/******************** */
 app.listen(3001, () => {
   console.log("Server started on port 3001");
 });

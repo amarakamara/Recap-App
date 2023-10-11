@@ -13,6 +13,10 @@ export function NoteProvider(props) {
   const [updateFavourites, setUpdateFavourites] = useState(false);
   const [collections, setCollections] = useState([]);
   const [collectionUpdated, setCollectionUpdated] = useState(false);
+  const [showCollectionPane, setShowCollectionPane] = useState(false);
+  const [collectionNotesUpdated, setCollectionNotesUpdated] = useState(false);
+  const [collectionId, setCollectionId] = useState("");
+  const [noteId, setNoteId] = useState("");
 
   const values = {
     notes,
@@ -27,6 +31,14 @@ export function NoteProvider(props) {
     setCollections,
     collectionUpdated,
     setCollectionUpdated,
+    showCollectionPane,
+    setShowCollectionPane,
+    collectionId,
+    setCollectionId,
+    noteId,
+    setNoteId,
+    collectionNotesUpdated,
+    setCollectionNotesUpdated,
   };
 
   return (

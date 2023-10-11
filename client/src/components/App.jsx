@@ -6,6 +6,7 @@ import CreateNote from "./CreateNote";
 import Message from "./Message";
 import Menu from "./Menu";
 import Ad from "./Ad";
+import AddToCollection from "../apis/AddToCollection";
 import { useUser } from "../contexts/UserContext";
 import { useNote } from "../contexts/NoteContext";
 
@@ -14,7 +15,18 @@ import "../styles.css";
 const api_base = "http://localhost:3001";
 
 export default function App() {
-  const { notes, setNotes, notesUpdated, setNotesUpdated } = useNote();
+  const {
+    notes,
+    setNotes,
+    notesUpdated,
+    setNotesUpdated,
+    collections,
+    setCollections,
+    noteId,
+    setShowCollectionPane,
+    showCollectionPane,
+  } = useNote();
+
   const { userInfo, userID, setUserInfo } = useUser();
   const [userInfoFetched, setUserInfoFetched] = useState(false);
 
@@ -30,7 +42,7 @@ export default function App() {
       });
       const data = await response.json();
       setUserInfo(data);
-      localStorage.setItem("userInfo", data);
+      localStorage.setItem("userInfo", JSON.stringify(data));
       setUserInfoFetched(true);
     };
     getUserInfo();
@@ -63,9 +75,59 @@ export default function App() {
     // eslint-disable-next-line
   }, [setNotes, userInfo, userInfoFetched, notesUpdated]);
 
+  //load all collections
+  useEffect(() => {
+    if (!userInfo) {
+      return;
+    }
+
+    const loadCollections = async () => {
+      await fetch(api_base + `/collections/${userInfo._id}`, {
+        method: "GET",
+        credentials: "include",
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Network Error failed to fetch.");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          setCollections(data);
+        })
+        .catch((error) => console.error("Error" + error.message));
+    };
+
+    loadCollections();
+    // eslint-disable-next-line
+  }, [userInfo]);
+
+  function AddNoteToCollection(cid) {
+    AddToCollection(cid, noteId, userInfo._id);
+  }
+
+  function closeCollectionPane() {
+    setShowCollectionPane(false);
+  }
+
   return (
     <>
       <CreateNote />
+      {showCollectionPane && (
+        <div className="collection-pane">
+          <button onClick={closeCollectionPane}>X</button>
+          {collections.map((collection) => {
+            return (
+              <h3
+                key={collection._id}
+                onClick={() => AddNoteToCollection(collection._id)}
+              >
+                {collection.name}
+              </h3>
+            );
+          })}
+        </div>
+      )}
       <div className="grid-container">
         <Header />
         <Menu />

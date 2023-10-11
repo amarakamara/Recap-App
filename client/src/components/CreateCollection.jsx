@@ -7,10 +7,14 @@ import { useUser } from "../contexts/UserContext";
 import addCollection from "../apis/addCollection";
 
 export default function CreateNote() {
-  const { setCollectionUpdated, collections, setCollections } = useNote();
+  const {
+    setCollectionUpdated,
+    collectionUpdated,
+    collections,
+    setCollections,
+  } = useNote();
   const { userInfo } = useUser();
   const [collectionName, setCollectionName] = useState("");
-
   const [isAdded, setIsAdded] = useState(false);
   const prevCollectionsLengthRef = useRef(collections.length);
 
@@ -39,9 +43,10 @@ export default function CreateNote() {
     }
   }
 
-  function submitCollection(event) {
+  async function submitCollection(event) {
     addCollection(userInfo, setCollections, collectionName);
     setCollectionUpdated(true);
+    console.log("I passed it");
     setCollectionName("");
     renderMessage();
     event.preventDefault();
@@ -76,6 +81,7 @@ export default function CreateNote() {
               type="text"
               placeholder="colleciton name"
               value={collectionName}
+              autoComplete={collectionName}
             />
             <Button type="submit" variant="contained" size="small">
               Add

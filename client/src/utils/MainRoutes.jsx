@@ -8,6 +8,7 @@ import View from "../pages/View";
 import Register from "../pages/Register";
 import Login from "../pages/Login";
 import Welcome from "../pages/Welcome";
+import ViewCollection from "../pages/ViewCollection";
 import PrivateRoute from "./PrivateRoute";
 
 export default function MainRoutes() {
@@ -20,6 +21,10 @@ export default function MainRoutes() {
         <Route path="/edit/:noteId" element={<EditNote />} />
         <Route path="/view/:noteId" element={<View />} />
         <Route path="/favourites" element={<Favourites />} />
+        <Route
+          path="/view-collection/:collectionId"
+          element={<ViewCollection />}
+        />
       </Route>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />

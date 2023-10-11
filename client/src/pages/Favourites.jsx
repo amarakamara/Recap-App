@@ -4,6 +4,7 @@ import Footer from "../components/Footer";
 import Menu from "../components/Menu";
 import Ad from "../components/Ad";
 import Note from "../components/Note";
+import AddToCollection from "../apis/AddToCollection";
 import { useNote } from "../contexts/NoteContext";
 import { useUser } from "../contexts/UserContext";
 import "../styles.css";
@@ -12,13 +13,17 @@ const api_base = "http://localhost:3001";
 
 export default function Favourites() {
   const { userInfo } = useUser();
-  console.log(userInfo);
+
   const {
     notes,
     favouriteNotes,
     setFavouriteNotes,
     updateFavourites,
     setUpdateFavourites,
+    collections,
+    noteId,
+    setShowCollectionPane,
+    showCollectionPane,
   } = useNote();
 
   //triggers loadNotes
@@ -48,10 +53,30 @@ export default function Favourites() {
     // eslint-disable-next-line
   }, [userInfo, updateFavourites, setFavouriteNotes]);
 
-  //load all favourite notes
+  function AddNoteToCollection(cid) {
+    AddToCollection(cid, noteId, userInfo._id);
+  }
 
+  function closeCollectionPane() {
+    setShowCollectionPane(false);
+  }
   return (
     <>
+      {showCollectionPane && (
+        <div className="collection-pane">
+          <button onClick={closeCollectionPane}>X</button>
+          {collections.map((collection) => {
+            return (
+              <h3
+                key={collection._id}
+                onClick={() => AddNoteToCollection(collection._id)}
+              >
+                {collection.name}
+              </h3>
+            );
+          })}
+        </div>
+      )}
       <div className="grid-container">
         <Header />
         <Menu />
