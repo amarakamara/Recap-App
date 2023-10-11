@@ -123,7 +123,7 @@ export default function Login() {
             </form>
             <div>
               <NavLink
-                className="text-blue no-underline text-xs font-medium lg:text-sm md:text-sm"
+                className="text-white no-underline text-xs font-medium lg:text-sm md:text-sm"
                 to="/register"
               >
                 Don't have an account? Let's make you one!

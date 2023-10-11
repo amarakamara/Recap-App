@@ -156,7 +156,7 @@ export default function Register() {
             </form>
             <div>
               <NavLink
-                className="text-blue no-underline text-xs font-medium lg:text-sm md:text-sm "
+                className="text-white no-underline text-xs font-medium lg:text-sm md:text-sm "
                 to="/login"
               >
                 Already have an account? Log In!

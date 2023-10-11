@@ -134,7 +134,7 @@ export default function App() {
         <Ad />
         <Footer />
 
-        <div className="container">
+        <div className="container w-full h-full pl-0 mt-10 flex flex-row flex-wrap flex-grow-0 overflow-y-scroll ">
           {notes.length === 0 ? (
             <Message />
           ) : (
