@@ -8,7 +8,7 @@ export default function AddButton(props) {
     <form className="buttonForm">
       <Zoom in={true}>
         <Fab
-          className="add-btn"
+          className="w-10 h-10 bg-blue text-white fixed right-9 bottom-20  lg:right-32 lg:bottom-12 md:right-20 md:bottom-12 z-50"
           onClick={() => {
             props.click();
           }}

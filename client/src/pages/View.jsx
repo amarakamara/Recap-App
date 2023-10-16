@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Menu from "../components/Menu";
 import Ad from "../components/Ad";
+import AccountMobile from "../components/AccountMobile"
 import { useNote } from "../contexts/NoteContext";
 import { useUser } from "../contexts/UserContext";
 
@@ -45,14 +46,15 @@ export default function View() {
     <>
       <div className="grid-container">
         <Header />
+        <AccountMobile />
         <Menu />
         <Ad notes={notes} />
         <Footer />
         <div className="container">
-          <div className="view-note">
-            <h2>{viewedNote.title}</h2>
-            <hr />
-            <p>{viewedNote.content}</p>
+          <div className="view-note w-full h-full bg-white text-blue py-5 px-10 overflow-y-scroll shadow-md">
+            <h2 className="font-jost text-lg">{viewedNote.title}</h2>
+            <hr className="w-full h-1" />
+            <p className="text-lg pt-5 px-0 pb-0">{viewedNote.content}</p>
           </div>
         </div>
       </div>

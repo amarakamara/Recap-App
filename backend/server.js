@@ -221,7 +221,7 @@ app.delete("/note/delete/:nid/:uid", ensureAuthenticated, async (req, res) => {
   if (validateObjectId(uid) && validateObjectId(nid)) {
     await Note.findOneAndRemove({ _id: nid, user: uid }).then((deletedNote) => {
       if (deletedNote) {
-        console.log("item deleted");
+        return res.status(200).json();
       } else {
         console.log("No note found or deleted");
       }
@@ -251,11 +251,11 @@ app.put("/edit/:nid/:uid", ensureAuthenticated, async (req, res) => {
   const content = req.body.content;
 
   if (validateObjectId(uid) && validateObjectId(nid)) {
-    await Note.findOneAndUpdate(
+    const collection = await Note.findOneAndUpdate(
       { _id: nid, user: uid },
       { title: title, content: content }
     );
-    res.send(flatted.stringify(collection));
+    res.send(stringify(collection));
   } else {
     console.log("Invalid Id String");
   }
@@ -340,14 +340,25 @@ app.patch(
       validateObjectId(cid) &&
       validateObjectId(nid)
     ) {
+      const collection = await Collection.findOne({
+        _id: cid,
+        notes: { $in: [nid] },
+      }).exec();
+
+      if (collection) {
+        return res
+          .status(200)
+          .json({ message: "Note already exist in collection" });
+      }
+
       await Collection.findOneAndUpdate(
         { _id: cid, user: uid },
         { $addToSet: { notes: nid } }
       );
-      res.status(200).json();
-      console.log("note added to collection");
+      return res.status(200).json({ message: "Note added successfully" });
     } else {
       console.log("Invalid Id String");
+      return res.status(500).json();
     }
   }
 );
@@ -371,7 +382,6 @@ app.patch(
         { $pull: { notes: nid } }
       );
       res.status(200).json();
-      console.log("note added to collection");
     } else {
       console.log("Invalid Id String");
     }

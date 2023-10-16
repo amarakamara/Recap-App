@@ -3,10 +3,11 @@ import Header from "./Header";
 import Note from "./Note";
 import Footer from "./Footer";
 import CreateNote from "./CreateNote";
-import Message from "./Message";
 import Menu from "./Menu";
 import Ad from "./Ad";
+import AccountMobile from "./AccountMobile";
 import AddToCollection from "../apis/AddToCollection";
+import CloseIcon from "@mui/icons-material/Close";
 import { useUser } from "../contexts/UserContext";
 import { useNote } from "../contexts/NoteContext";
 
@@ -29,6 +30,8 @@ export default function App() {
 
   const { userInfo, userID, setUserInfo } = useUser();
   const [userInfoFetched, setUserInfoFetched] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
+  const [showMessage, setShowMessage] = useState(false);
 
   //fetch userInfo
   useEffect(() => {
@@ -102,9 +105,20 @@ export default function App() {
     // eslint-disable-next-line
   }, [userInfo]);
 
-  function AddNoteToCollection(cid) {
-    AddToCollection(cid, noteId, userInfo._id);
+  async function AddNoteToCollection(cid) {
+    const message = await AddToCollection(cid, noteId, userInfo._id);
+    setStatusMessage(message);
+    setShowMessage(true);
   }
+  useEffect(() => {
+    if (showMessage) {
+      const timer = setTimeout(() => {
+        setShowMessage(false);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [showMessage]);
 
   function closeCollectionPane() {
     setShowCollectionPane(false);
@@ -113,41 +127,73 @@ export default function App() {
   return (
     <>
       <CreateNote />
+
       {showCollectionPane && (
-        <div className="collection-pane">
-          <button onClick={closeCollectionPane}>X</button>
-          {collections.map((collection) => {
-            return (
-              <h3
-                key={collection._id}
-                onClick={() => AddNoteToCollection(collection._id)}
-              >
-                {collection.name}
-              </h3>
-            );
-          })}
+        <div className="rounded-md shadow-md absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col p-0 max-h-50vh h-60 max-w-50vw w-60 bg-white text-blue z-50">
+          <div className="relative flex flex-row justify-center w-full h-auto bg-blue">
+            <div className="w-full 3/4 pl-1">
+              <h2 className="text-white text-xl font-semibold">Collections</h2>
+            </div>
+            <div className="w-full 1/4 text-right pr-1">
+              <button className="text-white mr-0">
+                <CloseIcon onClick={closeCollectionPane} />
+              </button>
+            </div>
+          </div>
+          <div className="w-full h-full  overflow-y-scroll">
+            {collections.map((collection) => {
+              return (
+                <div key={collection._id} className="w-full">
+                  <h3
+                    className="my-1 px-2 text-xl cursor-pointer bg-blue bg-opacity-50 text-white"
+                    onClick={() => AddNoteToCollection(collection._id)}
+                  >
+                    {collection.name}
+                  </h3>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
+      {showMessage &&
+        (statusMessage.includes("exist") ? (
+          <p className="text-base text-red font-semibold absolute transform -translate-x-1/2 -translate-y-1/2 top-16 right-1/4 z-50">
+            {statusMessage}
+          </p>
+        ) : (
+          <p className="text-base text-green font-semibold absolute transform -translate-x-1/2 -translate-y-1/2 top-16 right-1/4 z-50">
+            {statusMessage}
+          </p>
+        ))}
       <div className="grid-container">
         <Header />
+        <AccountMobile />
         <Menu />
         <Ad />
         <Footer />
-
-        <div className="container w-full h-full pl-0 mt-10 flex flex-row flex-wrap flex-grow-0 overflow-y-scroll ">
+        <div className="container w-full h-full mt-5 overflow-y-scroll overflow-x-hidden  flex flex-row flex-wrap content-start px-2">
           {notes.length === 0 ? (
-            <Message />
+            <h2 className="transform -translate-x-1/2 -translate-y-1/2 text-base font-bold text-blue bg-white absolute top-1/2 left-1/2">
+              You don't have any notes yet. Click the + button to start adding
+              notes.
+            </h2>
           ) : (
             notes &&
             notes.map((note) => (
-              <Note
+              <div
                 key={note._id}
-                id={note._id}
-                title={note.title}
-                content={note.content}
-                date={note.createdAt}
-                favourited={note.favourited}
-              />
+                className="w-1/2 h-auto flex justify-center sm:w-1/2 md:w-1/2 lg:w-1/3 xl:w-1/4 p-0 m-0"
+              >
+                <Note
+                  key={note._id}
+                  id={note._id}
+                  title={note.title}
+                  content={note.content}
+                  date={note.createdAt}
+                  favourited={note.favourited}
+                />
+              </div>
             ))
           )}
         </div>

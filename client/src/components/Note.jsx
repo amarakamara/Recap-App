@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { NavLink, useLocation, useParams } from "react-router-dom";
 import FavoriteOutlinedIcon from "@mui/icons-material/FavoriteOutlined";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
@@ -16,6 +16,7 @@ function Note(props) {
   const { collectionId } = useParams();
   const { userInfo } = useUser();
   const [openOption, setOpenOption] = useState(false);
+
   const {
     setCollectionNotesUpdated,
     setShowCollectionPane,
@@ -26,9 +27,23 @@ function Note(props) {
     setNoteId,
   } = useNote();
 
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setScreenWidth(window.innerWidth);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  const maxContentLength = screenWidth < 640 ? 20 : 50;
+
   const contentToDisplay =
-    props.content.length >= 200
-      ? props.content.substring(0, 50) + " "
+    props.content.length > maxContentLength
+      ? props.content.substring(0, 50)
       : props.content;
 
   function openCollectionPane() {
@@ -62,14 +77,17 @@ function Note(props) {
   }
 
   return (
-    <div className="note bg-white rounded-md box-border w-215 max-h-auto my-0 mx-4 relative overflow-hidden self-start">
+    <div
+      className="m-2 bg-white rounded-md shadow-md box-border w-full lg:w-72 md:w-96 h-auto relative overflow-hidden self-start 
+    "
+    >
       {openOption && (
-        <div className="absolute right-5 top-1 max-w-50vw h-auto z-10 bg-blue bg-opacity-90 text-white p-1">
+        <div className="absolute right-5 top-1 max-w-50vw h-auto z-10 bg-blue text-white p-1">
           <p className="mt-1 text-xxs block" onClick={openCollectionPane}>
             Add to Collection
           </p>
           {currentPath.startsWith("/view-collection") && (
-            <p className="mt-1 text-xl block" onClick={handleRemove}>
+            <p className="mt-1 text-xxs block" onClick={handleRemove}>
               Remove from Collection
             </p>
           )}
@@ -89,20 +107,32 @@ function Note(props) {
         <MoreVertIcon className="absolute right-0" onClick={openOptionPane} />
       </div>
 
-      <div className="pl-2">
+      <div className="px-1">
         <h1 className="text-blue font-jost text-2xl mb-2 block">
           {props.title}
         </h1>
-        <p className="text-base mb-2 whitespace-pre-wrap break-words block text-blue">
+        <p className="text-base mb-0  whitespace-pre-wrap break-words inline text-blue">
           {contentToDisplay}
         </p>
-        {props.content.length >= 200 && (
-          <NavLink className="text-base text-blue" to={`/view/${props.id}`}>
-            read more
-          </NavLink>
-        )}
+        {screenWidth < 640
+          ? props.content.length >= 20 && (
+              <NavLink
+                className="text-xs text-blue inline ml-1"
+                to={`/view/${props.id}`}
+              >
+                read more...
+              </NavLink>
+            )
+          : props.content.length >= 50 && (
+              <NavLink
+                className="text-xs text-blue inline ml-1"
+                to={`/view/${props.id}`}
+              >
+                read more...
+              </NavLink>
+            )}
       </div>
-      <div className="note-meta w-full py-0 px-2 bg-blue flex flex-row items-center justify-center flex-nowrap relative bottom-0 z-0">
+      <div className="note-meta w-full py-0 px-1 bg-blue flex flex-row items-center justify-center flex-nowrap relative bottom-0 z-0">
         <p className="text-xxs whitespace-pre break-words my-auto mx-0 w-full text-white">
           Created: {props.date}
         </p>

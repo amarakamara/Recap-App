@@ -26,6 +26,12 @@ module.exports = {
       fontSize: {
         xxs: ".8rem",
       },
+      borderWidth: {
+        1: "1px",
+        3: "3px",
+        5: "5px",
+        8: "8px",
+      },
     },
     fontFamily: {
       jost: ["Jost", "sans-serif"],
@@ -36,7 +42,8 @@ module.exports = {
       white: "#ffff",
       red: "#FF1E00",
       Dred: "#b30505",
-      transparent: "#00FFFFFF",
+      transparent: "rgba(0, 0, 0, 0)",
+      green: "#54B435",
     },
   },
   plugins: [],

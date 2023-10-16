@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import CancelButton from "./CancelButton";
+import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
 import LogoutIcon from "@mui/icons-material/Logout";
 //import { useUser } from "../contexts/UserContext";
@@ -38,7 +38,7 @@ export default function Header(props) {
       {showMobileMenu && (
         <div className="mobile-menu md:invisible lg:invisible absolute top-0 right-0 z-50 max-w-50vw w-vw40 h-auto bg-white">
           <div className="top w-full py-1.5 px-0 m-0 text-white">
-            <CancelButton click={closeMenu} />
+            <CloseIcon onClick={closeMenu} />
           </div>
           <ul className="menu-ul my-2 mx-0">
             <li>
@@ -64,19 +64,19 @@ export default function Header(props) {
           </div>
         </div>
       )}
-      <header>
-        <div className="header-inner w-full h-full flex flex-row flex-nowrap justify-center basis-1/2">
-          <div className="logo-div relative flex flex-row justify-center w-full pt-2 pb-auto px-0">
+      <header className="py-2 px-3">
+        <div className="header-inner w-full h-full flex flex-row flex-nowrap justify-center basis-1/2 m-0">
+          <div className="logo-div relative w-full overflow-hidden">
             <img
-              className="absolute left-0 w-32"
+              className="absolute transform -translate-x-1/2 -translate-y-1/2 left-1/3  top-6 w-32"
               src="assets/logoPng.png"
               alt="logo"
             />
           </div>
-          <div className="relative flex flex-row justify-center w-full h-auto pt-2 pb-auto px-0">
+          <div className="relative w-full h-auto">
             <button
               onClick={openMenu}
-              className="absolute right-0 text-white md:invisible lg:invisible"
+              className="absolute transform -translate-x-1/2 -translate-y-1/2 -right-5 top-5 text-white md:invisible lg:invisible"
             >
               <MenuIcon fontSize="large" />
             </button>

@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Menu from "../components/Menu";
 import Ad from "../components/Ad";
+import AccountMobile from "../components/AccountMobile";
 import Button from "@mui/material/Button";
 import { useNote } from "../contexts/NoteContext";
 import { useUser } from "../contexts/UserContext";
@@ -73,24 +74,35 @@ export default function EditNote() {
     <>
       <div className="grid-container">
         <Header />
+        <AccountMobile />
         <Menu />
         <Ad notes={notes} />
         <Footer />
         <div className="container">
-          <form className="edit-form" method="Post">
+          <form
+            className="edit-form w-full h-full bg-white shadow-md rounded-md p-2.5 my-5 mx-auto"
+            method="Post"
+          >
             <input
               onChange={handleChange}
               name="title"
               type="text"
               value={noteData.title}
+              className="w-full h-12 pl-2.5 block border-1 border-blue rounded-md mb-7"
             />
             <textarea
               onChange={handleChange}
               rows="3"
               name="content"
               value={noteData.content}
+              className="block border-1 border-blue rounded-md  w-full h-80 pl-2.5"
             />
-            <Button onClick={handleClick} variant="contained" size="small">
+            <Button
+              onClick={handleClick}
+              variant="contained"
+              size="small"
+              className="update-btn w-full py-1.5 px-0 text-base font-normal text-white cursor-pointer font-poppins"
+            >
               Update
             </Button>
           </form>

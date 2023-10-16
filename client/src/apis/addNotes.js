@@ -1,6 +1,11 @@
 const api_base = "http://localhost:3001";
 
-export default async function addNote(userInfo, setNotes, note) {
+export default async function addNote(
+  userInfo,
+  setNotes,
+  note,
+  setNotesUpdated
+) {
   if (!userInfo) {
     return;
   }
@@ -23,6 +28,7 @@ export default async function addNote(userInfo, setNotes, note) {
       setNotes((prevNotes) => [...prevNotes, newNote]);
     }
   } catch (error) {
+    setNotesUpdated(false);
     console.error(error);
   }
 }

@@ -6,7 +6,7 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 
 export default function Menu() {
   return (
-    <nav className="menu invisible md:visible lg:visible">
+    <nav className="menu invisible md:visible lg:visible shadow-md flex flex-col flex-grow justify-center items-center w-auto h-96 my-auto mx-0 pt-5 px-2 pb-2.5 z-50">
       <ul>
         <li>
           <NavLink className="link-items" to="/home">

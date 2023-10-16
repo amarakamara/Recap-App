@@ -7,12 +7,7 @@ import { useUser } from "../contexts/UserContext";
 import addCollection from "../apis/addCollection";
 
 export default function CreateNote() {
-  const {
-    setCollectionUpdated,
-    collectionUpdated,
-    collections,
-    setCollections,
-  } = useNote();
+  const { setCollectionUpdated, collections, setCollections } = useNote();
   const { userInfo } = useUser();
   const [collectionName, setCollectionName] = useState("");
   const [isAdded, setIsAdded] = useState(false);
@@ -29,14 +24,12 @@ export default function CreateNote() {
   const [message, setMessage] = useState(null);
   function renderMessage() {
     if (isAdded) {
-      setMessage(<p style={{ color: "#54B435" }}>Note added successfully!</p>);
+      setMessage(<p className="text-green">Collection added successfully!</p>);
       setTimeout(() => {
         setMessage(null);
       }, 2000);
     } else {
-      setMessage(
-        <p style={{ color: "#C21010" }}>Something went wrong! Try Again.</p>
-      );
+      setMessage(<p className="text-red">Something went wrong! Try Again.</p>);
       setTimeout(() => {
         setMessage(null);
       }, 2000);
@@ -46,7 +39,6 @@ export default function CreateNote() {
   async function submitCollection(event) {
     addCollection(userInfo, setCollections, collectionName);
     setCollectionUpdated(true);
-    console.log("I passed it");
     setCollectionName("");
     renderMessage();
     event.preventDefault();
@@ -70,20 +62,32 @@ export default function CreateNote() {
 
   return (
     <>
-      <div className="wrapper">
+      <div className="absolute w-full max-w-screen max-h-screen h-screen flex flex-col items-center justify-center ">
         {isExpanded && (
-          <form className="note-box" onSubmit={submitCollection}>
+          <form
+            className="w-80 lg:w-1/2 md:w-1/3 h-auto bg-white rounded-md shadow-md flex flex-col pt-4 px-0 pb-0 absolute right-auto left-auto top-auto z-50 overflow-auto"
+            onSubmit={submitCollection}
+          >
             {message}
             <CancelButton click={close} />
+            <p className="text-xxs ml-3 text-blue">
+              Please refresh after adding.
+            </p>
             <input
               onChange={(e) => setCollectionName(e.target.value)}
               name="name"
               type="text"
-              placeholder="colleciton name"
+              placeholder="collection name"
               value={collectionName}
               autoComplete={collectionName}
+              className="border-0 mb-3 mt-4 ml-2 p-2.5 block"
             />
-            <Button type="submit" variant="contained" size="small">
+            <Button
+              type="submit"
+              variant="contained"
+              size="small"
+              className="submitNote-btn w-full py-1.5 px-0 text-base font-normal text-white cursor-pointer font-poppins"
+            >
               Add
             </Button>
           </form>

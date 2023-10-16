@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import AddButton from "./AddButton";
-import Button from "@mui/material/Button";
 import CancelButton from "./CancelButton";
 import { useNote } from "../contexts/NoteContext";
 import { useUser } from "../contexts/UserContext";
@@ -26,16 +25,15 @@ export default function CreateNote(props) {
 
   const [isExpanded, setExpand] = useState(false);
   const [message, setMessage] = useState(null);
+
   function renderMessage() {
     if (isAdded) {
-      setMessage(<p style={{ color: "#54B435" }}>Note added successfully!</p>);
+      setMessage(<p className="text-green">Note added successfully!</p>);
       setTimeout(() => {
         setMessage(null);
       }, 2000);
     } else {
-      setMessage(
-        <p style={{ color: "#C21010" }}>Something went wrong! Try Again.</p>
-      );
+      setMessage(<p className="text-red">Something went wrong! Try Again.</p>);
       setTimeout(() => {
         setMessage(null);
       }, 2000);
@@ -72,9 +70,12 @@ export default function CreateNote(props) {
 
   return (
     <>
-      <div className="wrapper">
+      <div className="absolute w-full max-w-screen max-h-screen h-screen flex flex-col items-center justify-center ">
         {isExpanded && (
-          <form className="note-box" onSubmit={submitNote}>
+          <form
+            className="w-80 lg:w-1/2 md:w-1/3 h-auto bg-white rounded-md shadow-md flex flex-col pt-4 px-0 pb-0 absolute right-auto left-auto top-auto z-50 overflow-auto"
+            onSubmit={submitNote}
+          >
             {message}
             <CancelButton click={close} />
             <input
@@ -83,17 +84,22 @@ export default function CreateNote(props) {
               type="text"
               placeholder="title"
               value={note.title}
+              className="border-0 mb-3 mt-4 ml-2 p-2.5 block"
             />
             <textarea
-              rows="3"
+              rows="8"
               onChange={handleChange}
               name="content"
               placeholder="note.."
               value={note.content}
+              className="border-0 mb-3 ml-2 p-2.5 block"
             />
-            <Button type="submit" variant="contained" size="small">
+            <button
+              type="submit"
+              className="submitNote-btn w-full py-1.5 px-0 text-base font-normal text-white cursor-pointer font-poppins"
+            >
               Add
-            </Button>
+            </button>
           </form>
         )}
       </div>
