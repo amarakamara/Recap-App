@@ -19,7 +19,9 @@ function Note(props) {
 
   const {
     setCollectionNotesUpdated,
+    collectionNotesUpdated,
     setShowCollectionPane,
+    showCollectionPane,
     notes,
     setNotes,
     setNotesUpdated,
@@ -50,8 +52,11 @@ function Note(props) {
     setNoteId(props.id);
     setShowCollectionPane(true);
   }
-  function openOptionPane() {
+  function toggleOptionPane() {
     setOpenOption(!openOption);
+    if (showCollectionPane) {
+      setShowCollectionPane(false);
+    }
   }
 
   function handleDelete() {
@@ -73,7 +78,7 @@ function Note(props) {
   };
   function handleRemove() {
     deleteFromCollection(collectionId, props.id, userInfo._id);
-    setCollectionNotesUpdated(true);
+    setCollectionNotesUpdated(!collectionNotesUpdated);
   }
 
   return (
@@ -83,11 +88,17 @@ function Note(props) {
     >
       {openOption && (
         <div className="absolute right-5 top-1 max-w-50vw h-auto z-10 bg-blue text-white p-1">
-          <p className="mt-1 text-xxs block" onClick={openCollectionPane}>
+          <p
+            className="mt-1 text-xxs block cursor-pointer"
+            onClick={openCollectionPane}
+          >
             Add to Collection
           </p>
           {currentPath.startsWith("/view-collection") && (
-            <p className="mt-1 text-xxs block" onClick={handleRemove}>
+            <p
+              className="mt-1 text-xxs block cursor-pointer"
+              onClick={handleRemove}
+            >
               Remove from Collection
             </p>
           )}
@@ -104,33 +115,35 @@ function Note(props) {
       )}
 
       <div className="noteTop w-full h-7 relative text-blue p-0">
-        <MoreVertIcon className="absolute right-0" onClick={openOptionPane} />
+        <MoreVertIcon className="absolute right-0" onClick={toggleOptionPane} />
       </div>
 
       <div className="px-1">
         <h1 className="text-blue font-jost text-2xl mb-2 block">
           {props.title}
         </h1>
-        <p className="text-base mb-0  whitespace-pre-wrap break-words inline text-blue">
-          {contentToDisplay}
-        </p>
-        {screenWidth < 640
-          ? props.content.length >= 20 && (
-              <NavLink
-                className="text-xs text-blue inline ml-1"
-                to={`/view/${props.id}`}
-              >
-                read more...
-              </NavLink>
-            )
-          : props.content.length >= 50 && (
-              <NavLink
-                className="text-xs text-blue inline ml-1"
-                to={`/view/${props.id}`}
-              >
-                read more...
-              </NavLink>
-            )}
+        <div className="content-box w-full h-10 overflow-y-auto mb-1">
+          <p className="text-base  whitespace-pre-wrap break-words inline text-blue">
+            {contentToDisplay}
+          </p>
+          {screenWidth < 640
+            ? props.content.length >= 20 && (
+                <NavLink
+                  className="text-xs text-blue inline ml-1"
+                  to={`/view/${props.id}`}
+                >
+                  read more...
+                </NavLink>
+              )
+            : props.content.length >= 50 && (
+                <NavLink
+                  className="text-xs text-blue inline ml-1"
+                  to={`/view/${props.id}`}
+                >
+                  read more...
+                </NavLink>
+              )}
+        </div>
       </div>
       <div className="note-meta w-full py-0 px-1 bg-blue flex flex-row items-center justify-center flex-nowrap relative bottom-0 z-0">
         <p className="text-xxs whitespace-pre break-words my-auto mx-0 w-full text-white">

@@ -32,7 +32,17 @@ const userSchema = new Schema(
   }
 );
 
-userSchema.plugin(passportLocalMongoose);
+userSchema.plugin(passportLocalMongoose, {
+  passwordValidator: function (password, cb) {
+    const passwordRegex =
+      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+    if (!password.match(passwordRegex)) {
+      return cb("Password must meet the required criteria");
+    }
+    return cb();
+  },
+});
 
 const User = mongoose.model("user", userSchema);
 

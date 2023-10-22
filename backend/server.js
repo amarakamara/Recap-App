@@ -82,6 +82,7 @@ function validateObjectId(id) {
 
 /****   Routes **** */
 
+/**Register */
 app.post("/register", (req, res) => {
   User.findOne({ username: req.body.username })
     .then((existingUser) => {
@@ -98,7 +99,19 @@ app.post("/register", (req, res) => {
         lastName: req.body.lastName,
       };
 
-      User.register(newUser, req.body.password, (err, user) => {
+      const password = req.body.password;
+
+      const passwordRegex =
+        /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+      if (!password.match(passwordRegex)) {
+        return res.status(400).json({
+          success: false,
+          message: "Password must meet the required criteria!",
+          authenticated: false,
+        });
+      }
+      User.register(newUser, password, (err, user) => {
         if (err) {
           console.error(err);
           return res.status(400).json({
@@ -165,12 +178,12 @@ app.post("/logout", (req, res, next) => {
   });
 });
 /**** get user*/
-// get user
-app.get("/user/:id", ensureAuthenticated, async (req, res) => {
-  const id = new ObjectId(req.params.id);
 
-  if (validateObjectId(id)) {
-    const response = await User.findOne({ _id: id });
+// get user
+app.get("/user/:uid", ensureAuthenticated, async (req, res) => {
+  const uid = new ObjectId(req.params.uid);
+  if (validateObjectId(uid)) {
+    const response = await User.findOne({ _id: uid });
     res.json(response);
   } else {
     console.log("Invalid Id String");
@@ -180,7 +193,6 @@ app.get("/user/:id", ensureAuthenticated, async (req, res) => {
 //returns the notes
 app.get("/notes/:uid", ensureAuthenticated, async (req, res) => {
   const uid = new ObjectId(req.params.uid);
-
   if (validateObjectId(uid)) {
     await Note.find({ user: uid })
       .then((foundNotes) => {
@@ -208,9 +220,19 @@ app.post("/addnotes", ensureAuthenticated, async (req, res) => {
     user: user,
   });
 
-  await note.save().then(() => {
-    console.log("new note saved");
-  });
+  try {
+    const savedNote = await note.save();
+    res.status(200).json({
+      success: true,
+      message: "Note Added Successfully!",
+      note: savedNote,
+    });
+  } catch (err) {
+    console.error("error adding note:", err);
+    res
+      .status(500)
+      .json({ success: false, message: "Something went wrong, try again!" });
+  }
 });
 
 //deletes a note
@@ -431,11 +453,20 @@ app.post("/createCollection", ensureAuthenticated, async (req, res) => {
       user: uid,
       image: imageUrl,
     });
-    await collection.save().then(() => {
-      console.log("new collection saved");
-    });
-  } else {
-    console.log("Invalid Id String");
+
+    try {
+      const savedCollection = await collection.save();
+      res.status(200).json({
+        success: true,
+        message: "Collection Added Successfully!",
+        collection: savedCollection,
+      });
+    } catch (err) {
+      console.error("error adding note:", err);
+      res
+        .status(500)
+        .json({ success: false, message: "Something went wrong, try again!" });
+    }
   }
 });
 

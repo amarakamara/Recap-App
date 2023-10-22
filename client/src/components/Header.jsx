@@ -3,11 +3,12 @@ import { NavLink, useNavigate } from "react-router-dom";
 import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
 import LogoutIcon from "@mui/icons-material/Logout";
-//import { useUser } from "../contexts/UserContext";
+
+import "../styles.css";
 
 const api_base = "http://localhost:3001";
 
-export default function Header(props) {
+export default function Header() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   // const { userID } = useUser();
   const navigate = useNavigate();
@@ -37,8 +38,8 @@ export default function Header(props) {
     <>
       {showMobileMenu && (
         <div className="mobile-menu md:invisible lg:invisible absolute top-0 right-0 z-50 max-w-50vw w-vw40 h-auto bg-white">
-          <div className="top w-full py-1.5 px-0 m-0 text-white">
-            <CloseIcon onClick={closeMenu} />
+          <div className="border-b-2 border-b-grey w-full py-1.5 px-0 m-0 h-12 text-white">
+            <CloseIcon className="text-blue" onClick={closeMenu} />
           </div>
           <ul className="menu-ul my-2 mx-0">
             <li>
@@ -65,10 +66,10 @@ export default function Header(props) {
         </div>
       )}
       <header className="py-2 px-3">
-        <div className="header-inner w-full h-full flex flex-row flex-nowrap justify-center basis-1/2 m-0">
+        <navbar className="header-inner w-full h-full flex flex-row flex-nowrap justify-center basis-1/2 m-0">
           <div className="logo-div relative w-full overflow-hidden">
             <img
-              className="absolute transform -translate-x-1/2 -translate-y-1/2 left-1/3  top-6 w-32"
+              className="absolute transform -translate-x-1/2 -translate-y-1/2 left-1/4 sm:left-1/4 lg:left-24  top-1/2 w-32"
               src="assets/logoPng.png"
               alt="logo"
             />
@@ -81,7 +82,7 @@ export default function Header(props) {
               <MenuIcon fontSize="large" />
             </button>
           </div>
-        </div>
+        </navbar>
       </header>
     </>
   );

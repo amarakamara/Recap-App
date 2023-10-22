@@ -86,6 +86,7 @@ export default function Collections() {
     loadNotes();
     // eslint-disable-next-line
   }, [userInfo]);
+  //collection Pane
 
   function closeCollectionPane() {
     setShowCollectionPane(false);

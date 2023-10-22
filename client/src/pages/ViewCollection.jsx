@@ -24,6 +24,7 @@ export default function ViewCollection() {
   const { collectionId } = useParams();
   const {
     notes,
+    setNotes,
     setCollectionNotesUpdated,
     collectionNotesUpdated,
     setShowCollectionPane,
@@ -65,11 +66,40 @@ export default function ViewCollection() {
     setCollectionNotesUpdated,
   ]);
 
+  useEffect(() => {
+    if (!userInfo) {
+      return;
+    }
+    const loadNotes = async () => {
+      try {
+        const response = await fetch(api_base + `/notes/${userInfo._id}`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw new Error("Network Error failed to fetch.");
+        }
+
+        const data = await response.json();
+        setNotes(data);
+      } catch (error) {
+        console.error("Error" + error.message);
+      }
+    };
+    loadNotes();
+    // eslint-disable-next-line
+  }, [userInfo]);
+
+  //Collection
+
   async function AddNoteToCollection(nid) {
     const message = await AddToCollection(collectionId, nid, userInfo._id);
     setStatusMessage(message);
     setShowMessage(true);
+    setCollectionNotesUpdated(!collectionNotesUpdated);
   }
+
   useEffect(() => {
     if (showMessage) {
       const timer = setTimeout(() => {

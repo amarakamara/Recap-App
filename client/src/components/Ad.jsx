@@ -36,8 +36,8 @@ export default function Ad() {
           />
         </div>
         <div>
-          <h3 className="mx-3 md:mr-1 text-lg md:text-xs font-semibold text-blue">
-            {userInfo.firstName + " " + userInfo.lastName}
+          <h3 className="mx-3 md:mr-1 lg:text-base lg:ml-4 md:text-xs font-semibold text-blue">
+            {userInfo && userInfo.firstName + " " + userInfo.lastName}
           </h3>
         </div>
       </div>
@@ -58,7 +58,7 @@ export default function Ad() {
           <p>{favouriteNotes.length}</p>
         </div>
       </div>
-      <div className="w-full h-auto bg-blue px-2.5 py-1 mt-10 z-10">
+      <div className="w-full h-auto bg-blue px-2.5 py-1 mt-0 z-10">
         <button
           className="text-xl text-white md:text-sm"
           onClick={handleLogOut}

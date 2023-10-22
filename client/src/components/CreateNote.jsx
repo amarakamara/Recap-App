@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import AddButton from "./AddButton";
 import CancelButton from "./CancelButton";
 import { useNote } from "../contexts/NoteContext";
@@ -6,50 +6,38 @@ import { useUser } from "../contexts/UserContext";
 import addNote from "../apis/addNotes";
 
 export default function CreateNote(props) {
-  const { notes, setNotes, setNotesUpdated } = useNote();
+  const { setNotes, setNotesUpdated } = useNote();
   const { userInfo } = useUser();
   const [note, setNote] = useState({
     title: "",
     content: "",
   });
 
-  const [isAdded, setIsAdded] = useState(false);
-  const prevNotesLengthRef = useRef(notes.length);
-
-  useEffect(() => {
-    if (notes.length > prevNotesLengthRef.current) {
-      setIsAdded(true);
-      prevNotesLengthRef.current = notes.length;
-    }
-  }, [notes]);
-
   const [isExpanded, setExpand] = useState(false);
-  const [message, setMessage] = useState(null);
+  const [statusMessage, setStatusMessage] = useState("");
+  const [showMessage, setShowMessage] = useState(false);
 
-  function renderMessage() {
-    if (isAdded) {
-      setMessage(<p className="text-green">Note added successfully!</p>);
-      setTimeout(() => {
-        setMessage(null);
-      }, 2000);
-    } else {
-      setMessage(<p className="text-red">Something went wrong! Try Again.</p>);
-      setTimeout(() => {
-        setMessage(null);
-      }, 2000);
-    }
-  }
-
-  function submitNote(event) {
-    addNote(userInfo, setNotes, note);
+  async function submitNote(event) {
+    event.preventDefault();
+    const message = await addNote(userInfo, setNotes, note);
+    setStatusMessage(message);
+    setShowMessage(true);
     setNotesUpdated(true);
     setNote({
       title: "",
       content: "",
     });
-    renderMessage();
-    event.preventDefault();
   }
+
+  useEffect(() => {
+    if (showMessage) {
+      const timer = setTimeout(() => {
+        setShowMessage(false);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [showMessage]);
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -76,7 +64,12 @@ export default function CreateNote(props) {
             className="w-80 lg:w-1/2 md:w-1/3 h-auto bg-white rounded-md shadow-md flex flex-col pt-4 px-0 pb-0 absolute right-auto left-auto top-auto z-50 overflow-auto"
             onSubmit={submitNote}
           >
-            {message}
+            {showMessage &&
+              (statusMessage.includes("Successfully") ? (
+                <p className="text-green">{statusMessage}</p>
+              ) : (
+                <p className="text-red">{statusMessage}</p>
+              ))}
             <CancelButton click={close} />
             <input
               onChange={handleChange}

@@ -24,8 +24,10 @@ export default async function addNote(
     });
 
     if (response.ok) {
-      const newNote = await response.json();
-      setNotes((prevNotes) => [...prevNotes, newNote]);
+      const data = await response.json();
+      setNotes((prevNotes) => [...prevNotes, data.note]);
+      const returnedMessage = data.message;
+      return returnedMessage;
     }
   } catch (error) {
     setNotesUpdated(false);

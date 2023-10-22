@@ -13,6 +13,7 @@ export default function RenderCollection(props) {
     setCollections,
     setCollectionUpdated,
     setShowCollectionPane,
+    showCollectionPane,
     setCollectionId,
   } = useNote();
   const { userInfo } = useUser();
@@ -27,8 +28,11 @@ export default function RenderCollection(props) {
     deleteCollection(props.id, userInfo, collections, setCollections);
     setCollectionUpdated(true);
   }
-  function openOptionPane() {
+  function toggleOptionPane() {
     setOpenOption(!openOption);
+    if (showCollectionPane) {
+      setShowCollectionPane(false);
+    }
   }
 
   return (
@@ -67,7 +71,7 @@ export default function RenderCollection(props) {
           <div className="w-full h-7 relative text-white p-0 z-10">
             <MoreVertIcon
               className="absolute right-0"
-              onClick={openOptionPane}
+              onClick={toggleOptionPane}
             />
           </div>
         </div>

@@ -73,7 +73,16 @@ export default function Login() {
         <div className="w-full h-full basis-full text-center md:relative md:bg-white md:overflow-hidden lg:relative lg:bg-white lg:overflow-hidden md:w-full md:h-full md:basis-1/2 lg:w-full lg:h-full lg:basis-1/2">
           <div className="flex flex-col justify-center items-center absolute inset-0 m-auto max-w-80vw max-h-80vh w-80vw h-80vh text-center lg:w-500 md:w-400 lg:h-auto md:h-auto lg:py-5 lg:px-7 md:p-3 text-blue">
             <div className="w-60">
-              <img src="assets/logoPng.png" alt="logo" />
+              <img
+                className="hidden lg:block"
+                src="assets/logo-blue.png"
+                alt="logo"
+              />
+              <img
+                className="block lg:hidden"
+                src="assets/logoPng.png"
+                alt="logo"
+              />
             </div>
             <form
               onSubmit={handleSubmit}
@@ -123,7 +132,7 @@ export default function Login() {
             </form>
             <div>
               <NavLink
-                className="text-white no-underline text-xs font-medium lg:text-sm md:text-sm"
+                className="text-white md:text-blue lg:text-blue no-underline text-xs font-medium lg:text-sm md:text-sm"
                 to="/register"
               >
                 Don't have an account? Let's make you one!
@@ -131,9 +140,9 @@ export default function Login() {
             </div>
           </div>
         </div>
-        <div className="item-1 item-1 invisible md:visible lg:visible md:relative lg:relative md:overflow-hidden lg:overflow-hidden md:bg-cover lg:bg-cover md:w-full md:h-full md:basis-1/2 lg:w-full lg:h-full lg:basis-1/2">
+        <div className="item-1 item-1 invisible md:visible lg:visible md:relative lg:relative md:overflow-hidden lg:overflow-hidden md:bg-cover lg:bg-cover md:w-full md:h-full md:basis-1/2 lg:w-full lg:h-full lg:basis-1/2 ">
           <img
-            className="logReg-img lg:w-full lg:h-full md:w-full md:h-full md:object-fill"
+            className="logReg-img lg:w-full lg:h-full md:w-full md:h-full object-cover"
             src="https://img.freepik.com/free-photo/business-financial-concept-with-crumpled-paper-wads-spiral-notebook-pen-blue-background-flat-lay_176474-6551.jpg?w=996&t=st=1696861477~exp=1696862077~hmac=215eb8a63131a5a3c179f2c1f036819d0bd794fd1ece1e97301ee12c69ea7c97"
             alt="note book"
           />

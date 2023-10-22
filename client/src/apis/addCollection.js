@@ -5,6 +5,7 @@ export default async function addCollection(
   userInfo,
   setCollections,
   collectionName,
+  setStatusMessage,
   randomImageUrl
 ) {
   if (!userInfo) {
@@ -26,14 +27,18 @@ export default async function addCollection(
       });
 
       if (response.ok) {
-        const newCollection = await response.json();
+        const data = await response.json();
         setCollections((prevCollections) => [
           ...prevCollections,
-          newCollection,
+          data.collection,
         ]);
+        const returnedMessage = data.message;
+        setStatusMessage(returnedMessage);
+        return returnedMessage;
       }
     } catch (error) {
       console.error(error);
+      return null;
     }
   });
 }

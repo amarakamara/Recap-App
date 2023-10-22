@@ -18,7 +18,7 @@ export default function Register() {
   });
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
+  const [showValidator, setShowValidator] = useState(false);
   useEffect(() => {
     if (showError) {
       const timer = setTimeout(() => {
@@ -86,8 +86,17 @@ export default function Register() {
         </div>
         <div className=" w-full h-full basis-full text-center md:relative md:bg-white md:overflow-hidden lg:relative lg:bg-white lg:overflow-hidden md:w-full md:h-full md:basis-1/2 lg:w-full lg:h-full lg:basis-1/2">
           <div className="flex flex-col justify-center items-center absolute inset-0 m-auto max-w-80vw max-h-80vh w-80vw h-80vh text-center lg:w-500 md:w-400 lg:h-auto md:h-auto lg:py-5 lg:px-7 md:p-3 text-blue">
-            <div className=" w-60">
-              <img src="assets/logoPng.png" alt="logo" />
+            <div className="w-60">
+              <img
+                className="hidden lg:block"
+                src="assets/logo-blue.png"
+                alt="logo"
+              />
+              <img
+                className="block lg:hidden"
+                src="assets/logoPng.png"
+                alt="logo"
+              />
             </div>
             <form
               method="post"
@@ -139,6 +148,7 @@ export default function Register() {
               />
               <input
                 onChange={handleChange}
+                onClick={() => setShowValidator(true)}
                 id="user-password"
                 type="password"
                 name="password"
@@ -147,6 +157,31 @@ export default function Register() {
                 autoComplete="off"
                 required
               />
+              {showValidator && (
+                <div className="w-full pl-2 text-left mb-2">
+                  {registerInfo.password.length < 8 && (
+                    <p className="text-xss font-semibold block text-red">
+                      password must be atleast 8 characters
+                    </p>
+                  )}
+                  {!/[a-zA-Z]/.test(registerInfo.password) && (
+                    <p className="text-xss font-semibold block text-red">
+                      password must include atleast one alphabet
+                    </p>
+                  )}
+                  {!/[0-9]/.test(registerInfo.password) && (
+                    <p className="text-xss font-semibold block text-red">
+                      password must include atleast on number
+                    </p>
+                  )}
+                  {!/[@$!%*?&]/.test(registerInfo.password) && (
+                    <p className="text-xss font-semibold block text-red">
+                      password must include atleast on special character
+                    </p>
+                  )}
+                </div>
+              )}
+
               <button
                 className="rounded-lg w-full py-1.5 px-0 text-base font-normal text-white cursor-pointer font-poppins"
                 type="submit"
@@ -156,7 +191,7 @@ export default function Register() {
             </form>
             <div>
               <NavLink
-                className="text-white no-underline text-xs font-medium lg:text-sm md:text-sm "
+                className="text-white md:text-blue lg:text-blue no-underline text-xs font-medium lg:text-sm md:text-sm "
                 to="/login"
               >
                 Already have an account? Log In!

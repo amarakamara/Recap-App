@@ -39,7 +39,7 @@ export default function AccountMobile() {
   return (
     <>
       {showAccountInfo && (
-        <div className=" mobile-menu md:invisible lg:invisible absolute top-0 right-0 z-50 max-w-50vw w-vw40 h-auto bg-white">
+        <div className=" mobile-menu md:invisible lg:invisible absolute top-0 right-0 z-50 max-w-50vw w-vw30 h-auto bg-white">
           <div className="top w-full h-auto py-.5 px-0 m-0 text-white flex flex-row justify-start">
             <CloseIcon onClick={closeAccountInfo} />
           </div>
@@ -52,14 +52,14 @@ export default function AccountMobile() {
               />
 
               <div>
-                <h3 className="mx-3 md:mr-1 text-lg md:text-xs font-semibold text-blue">
+                <h3 className="mx-3 md:mr-1 text-xs md:text-xs font-semibold text-blue">
                   {userInfo.firstName + " " + userInfo.lastName}
                 </h3>
               </div>
             </div>
           </div>
           <div className="w-full h-auto bg-blue px-2.5 py-1">
-            <button className="text-xl text-white" onClick={handleLogOut}>
+            <button className="text-md text-white" onClick={handleLogOut}>
               Log out <LogoutIcon className="ml-2 text-sm" />
             </button>
           </div>

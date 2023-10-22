@@ -35,18 +35,25 @@ export default function App() {
 
   //fetch userInfo
   useEffect(() => {
+    if (!userID) {
+      return;
+    }
     const getUserInfo = async () => {
-      if (!userID) {
-        return;
+      try {
+        const response = await fetch(api_base + `/user/${userID}`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setUserInfo(data);
+          localStorage.setItem("userInfo", JSON.stringify(data));
+          setUserInfoFetched(true);
+        }
+      } catch (error) {
+        console.error(error);
       }
-      const response = await fetch(api_base + `/user/${userID}`, {
-        method: "GET",
-        credentials: "include",
-      });
-      const data = await response.json();
-      setUserInfo(data);
-      localStorage.setItem("userInfo", JSON.stringify(data));
-      setUserInfoFetched(true);
     };
     getUserInfo();
   }, [userID, setUserInfo]);
@@ -105,6 +112,8 @@ export default function App() {
     // eslint-disable-next-line
   }, [userInfo]);
 
+  //CollectionPane
+
   async function AddNoteToCollection(cid) {
     const message = await AddToCollection(cid, noteId, userInfo._id);
     setStatusMessage(message);
@@ -129,7 +138,7 @@ export default function App() {
       <CreateNote />
 
       {showCollectionPane && (
-        <div className="rounded-md shadow-md absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col p-0 max-h-50vh h-60 max-w-50vw w-60 bg-white text-blue z-50">
+        <div className="cPane rounded-md shadow-md absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col p-0 max-h-50vh h-60 max-w-50vw w-60 bg-white text-blue z-50">
           <div className="relative flex flex-row justify-center w-full h-auto bg-blue">
             <div className="w-full 3/4 pl-1">
               <h2 className="text-white text-xl font-semibold">Collections</h2>

@@ -9,6 +9,7 @@ import Register from "../pages/Register";
 import Login from "../pages/Login";
 import Welcome from "../pages/Welcome";
 import ViewCollection from "../pages/ViewCollection";
+import Page404 from "../pages/Page404";
 import PrivateRoute from "./PrivateRoute";
 
 export default function MainRoutes() {
@@ -28,6 +29,8 @@ export default function MainRoutes() {
       </Route>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/404" element={<Page404 />} />
+      <Route path="*" element={<Page404 />} />
     </Routes>
   );
 }
