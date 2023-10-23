@@ -1,7 +1,7 @@
 /***Imports */
 import dotenv from "dotenv";
 dotenv.config();
-import { ObjectId } from "mongodb";
+import { ObjectId, ServerApiVersion } from "mongodb";
 import express from "express";
 import mongoose from "mongoose";
 import session from "express-session";
@@ -58,14 +58,16 @@ app.use(
   })
 );
 
+
+
 //initialize passport
 app.use(passport.initialize());
 app.use(passport.session());
 
 /*******  Module Imports  ******/
-import Note from "./models/note.js";
-import User from "./models/user.js";
-import Collection from "./models/collection.js";
+import Note from "./models/Note.js";
+import User from "./models/User.js";
+import Collection from "./models/Collection.js";
 
 passport.use(User.createStrategy());
 

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import passportLocalMongoose from "passport-local-mongoose";
-import Note from "./note.js";
-import User from "./user.js";
+import Note from "./Note.js";
+import User from "./User.js";
 
 const Schema = mongoose.Schema;
 
