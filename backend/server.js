@@ -19,8 +19,16 @@ const FileStore = sessionFileStore(session);
 const app = express();
 
 //connection
+
+const uri = `mongodb+srv://akamar5050:${process.env.MONGO_PWD}@cluster0.ucoihg1.mongodb.net/recapApp?retryWrites=true&w=majority`;
 mongoose
-  .connect("mongodb://127.0.0.1:27017/recapApp")
+  .connect(uri, {
+    serverApi: {
+      version: ServerApiVersion.v1,
+      strict: true,
+      deprecationErrors: true,
+    },
+  })
   .then(() => console.log("connected to dB"))
   .catch((err) => {
     console.error(err);
