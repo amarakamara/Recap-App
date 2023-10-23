@@ -70,7 +70,7 @@ export default function Header() {
           <div className="logo-div relative w-full overflow-hidden">
             <img
               className="absolute transform -translate-x-1/2 -translate-y-1/2 left-1/4 sm:left-1/4 lg:left-24  top-1/2 w-32"
-              src="assets/logoPng.png"
+              src="/assets/logoPng.png"
               alt="logo"
             />
           </div>
