@@ -6,7 +6,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 
 import "../styles.css";
 
-const api_base = "http://localhost:3001";
+const api_base = process.env.REACT_APP_API_ENDPOINT;
 
 export default function Header() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);

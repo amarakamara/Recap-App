@@ -13,7 +13,7 @@ import { useNote } from "../contexts/NoteContext";
 
 import "../styles.css";
 
-const api_base = "http://localhost:3001";
+const api_base = process.env.REACT_APP_API_ENDPOINT;
 
 export default function App() {
   const {

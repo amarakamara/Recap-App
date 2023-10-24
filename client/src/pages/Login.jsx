@@ -3,7 +3,7 @@ import { useNavigate, NavLink } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useUser } from "../contexts/UserContext";
 
-const api_base = "http://localhost:3001";
+const api_base = process.env.REACT_APP_API_ENDPOINT;
 
 export default function Login() {
   const { setIsAuthenticated } = useAuth();

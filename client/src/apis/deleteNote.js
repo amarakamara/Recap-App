@@ -1,4 +1,4 @@
-const api_base = "http://localhost:3001";
+const api_base = process.env.REACT_APP_API_ENDPOINT;
 
 export default async function deleteNote(id, userInfo, notes, setNotes) {
   try {

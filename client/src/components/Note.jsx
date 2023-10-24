@@ -8,7 +8,7 @@ import deleteNote from "../apis/deleteNote";
 import deleteFromCollection from "../apis/deleteFromCollection";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 
-const api_base = "http://localhost:3001";
+const api_base = process.env.REACT_APP_API_ENDPOINT;
 
 function Note(props) {
   const location = useLocation();
