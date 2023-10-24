@@ -1,7 +1,7 @@
 [build]
   base = "client"  # Set the base directory for your build (your React app)
   publish = "client/build"  # Set the directory to publish (your built React app)
-  command = "npm run build"  # The build command for your React app
+  command = "CI= npm run build"  # The build command for your React app
 
 [context.production.environment]
   NODE_ENV = "production"  # Set the Node environment to production
