@@ -1,4 +1,4 @@
-/***Imports */
+/*** Imports ***/
 import dotenv from "dotenv";
 dotenv.config();
 import { ObjectId, ServerApiVersion } from "mongodb";
@@ -9,18 +9,18 @@ import passport from "passport";
 import passportLocalMongoose from "passport-local-mongoose";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
-import sessionFileStore from "session-file-store";
 import logger from "morgan";
 import cors from "cors";
 import { stringify, parse } from "flatted";
+import connectMongo from "connect-mongo"; // Import connect-mongo
 
-const FileStore = sessionFileStore(session);
+const MongoStore = connectMongo(session); // Create a session store using connect-mongo
 
 const app = express();
 
-//connection
-
+// Connection
 const uri = `mongodb+srv://akamar5050:${process.env.MONGO_PWD}@cluster0.ucoihg1.mongodb.net/recapApp?retryWrites=true&w=majority`;
+
 mongoose
   .connect(uri, {
     serverApi: {
@@ -34,7 +34,7 @@ mongoose
     console.error(err);
   });
 
-/*****Middlewares*****/
+/***** Middlewares *****/
 
 app.use(express.json());
 const allowedOrigins = [
@@ -53,12 +53,15 @@ app.use(bodyParser.json());
 app.use(cookieParser(process.env.SESSION_SECRET));
 app.use(
   session({
-    store: new FileStore(),
+    store: new MongoStore({
+      mongooseConnection: mongoose.connection,
+    }),
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
       secure: true,
+      maxAge: 24 * 60 * 60 * 1000,
     },
   })
 );
@@ -79,6 +82,7 @@ passport.deserializeUser(User.deserializeUser());
 
 //Auth Middlewares
 function ensureAuthenticated(req, res, next) {
+  console.log("Logging req.user:", req.user);
   if (req.user) {
     return next();
   }
@@ -169,6 +173,7 @@ app.post("/login", (req, res, next) => {
 
     // You can perform additional actions upon successful login here
     req.login(user, (loginErr) => {
+      console.log(req.user);
       if (loginErr) {
         return next(loginErr);
       }
