@@ -35,9 +35,14 @@ mongoose
   });
 
 /*****Middlewares*****/
+
 app.use(express.json());
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://recapnote.netlify.app",
+];
 const options = {
-  origin: "http://localhost:3000",
+  origin: allowedOrigins,
   methods: ["GET", "POST", "PUT", "DELETE", "UPDATE", "PATCH"],
   credentials: true,
 };
@@ -57,8 +62,6 @@ app.use(
     },
   })
 );
-
-
 
 //initialize passport
 app.use(passport.initialize());
