@@ -44,7 +44,7 @@ export default function Register() {
   function handleSubmit(event) {
     event.preventDefault();
 
-    fetch(api_base + "register", {
+    fetch(api_base + "/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",

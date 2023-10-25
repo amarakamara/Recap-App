@@ -96,7 +96,7 @@ function validateObjectId(id) {
 /****   Routes **** */
 
 /**Register */
-app.post("register", (req, res) => {
+app.post("/register", (req, res) => {
   User.findOne({ username: req.body.username })
     .then((existingUser) => {
       if (existingUser) {
