@@ -12,9 +12,7 @@ import cookieParser from "cookie-parser";
 import logger from "morgan";
 import cors from "cors";
 import { stringify, parse } from "flatted";
-import connectMongo from "connect-mongo"; // Import connect-mongo
-
-const MongoStore = connectMongo(session); // Create a session store using connect-mongo
+import MongoStore from "connect-mongo";
 
 const app = express();
 
@@ -29,7 +27,9 @@ mongoose
       deprecationErrors: true,
     },
   })
-  .then(() => console.log("connected to dB"))
+  .then(() => {
+    console.log("connected to dB");
+  })
   .catch((err) => {
     console.error(err);
   });
@@ -48,20 +48,24 @@ const options = {
 };
 app.use(cors(options));
 app.use(logger("combined"));
+
+app.use(cookieParser(process.env.SESSION_SECRET));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(cookieParser(process.env.SESSION_SECRET));
+
 app.use(
   session({
-    store: new MongoStore({
-      mongooseConnection: mongoose.connection,
-    }),
     secret: process.env.SESSION_SECRET,
-    resave: false,
     saveUninitialized: false,
+    resave: false,
+    store: MongoStore.create({
+      mongoUrl: uri,
+      ttl: 48 * 60 * 60,
+      touchAfter: 24 * 3600,
+    }),
     cookie: {
       secure: true,
-      maxAge: 24 * 60 * 60 * 1000,
+      maxAge: 2 * 24 * 60 * 60 * 1000,
     },
   })
 );
@@ -173,7 +177,7 @@ app.post("/login", (req, res, next) => {
 
     // You can perform additional actions upon successful login here
     req.login(user, (loginErr) => {
-      console.log(req.user);
+      console.log("Logging req.user from login", req.user);
       if (loginErr) {
         return next(loginErr);
       }
