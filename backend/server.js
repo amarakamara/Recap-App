@@ -37,15 +37,24 @@ mongoose
 /***** Middlewares *****/
 
 app.use(express.json());
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://recapnote.netlify.app",
-];
+const allowedOrigins = ["https://recapnote.netlify.app"];
+
+if (process.env.NODE_ENV === "development") {
+  allowedOrigins.push("http://localhost:3000");
+}
+
 const options = {
-  origin: allowedOrigins,
+  origin: function (origin, callback) {
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   methods: ["GET", "POST", "PUT", "DELETE", "UPDATE", "PATCH"],
   credentials: true,
 };
+
 app.use(cors(options));
 app.use(logger("combined"));
 
@@ -53,6 +62,7 @@ app.use(cookieParser(process.env.SESSION_SECRET));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+app.set("trust proxy", 1);
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -62,10 +72,12 @@ app.use(
       mongoUrl: uri,
       ttl: 48 * 60 * 60,
       touchAfter: 24 * 3600,
+      autoRemove: "native",
     }),
     cookie: {
       secure: true,
       maxAge: 2 * 24 * 60 * 60 * 1000,
+      httpOnly: false,
     },
   })
 );
@@ -81,9 +93,17 @@ import Collection from "./models/Collection.js";
 
 passport.use(User.createStrategy());
 
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+passport.serializeUser(function (user, cb) {
+  process.nextTick(function () {
+    cb(null, { id: user.id, username: user.username });
+  });
+});
 
+passport.deserializeUser(function (user, cb) {
+  process.nextTick(function () {
+    return cb(null, user);
+  });
+});
 //Auth Middlewares
 function ensureAuthenticated(req, res, next) {
   console.log("Logging req.user:", req.user);
@@ -177,11 +197,10 @@ app.post("/login", (req, res, next) => {
 
     // You can perform additional actions upon successful login here
     req.login(user, (loginErr) => {
-      console.log("Logging req.user from login", req.user);
       if (loginErr) {
         return next(loginErr);
       }
-      return res.status(200).json({
+      return res.status(200).send({
         message: "Login successful",
         user: user,
         authenticated: true,
