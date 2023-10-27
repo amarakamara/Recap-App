@@ -37,6 +37,7 @@ mongoose
 /***** Middlewares *****/
 
 app.use(express.json());
+
 const allowedOrigins = ["https://recapnote.netlify.app"];
 
 if (process.env.NODE_ENV === "development") {
@@ -44,13 +45,7 @@ if (process.env.NODE_ENV === "development") {
 }
 
 const options = {
-  origin: function (origin, callback) {
-    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
+  origin: allowedOrigins,
   methods: ["GET", "POST", "PUT", "DELETE", "UPDATE", "PATCH"],
   credentials: true,
 };
