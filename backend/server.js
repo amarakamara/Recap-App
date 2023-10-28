@@ -95,14 +95,14 @@ passport.serializeUser(function (user, cb) {
 });
 
 passport.deserializeUser(function (user, cb) {
+  console.log("Inside deserializer");
   process.nextTick(function () {
     return cb(null, user);
   });
 });
 //Auth Middlewares
 function ensureAuthenticated(req, res, next) {
-  console.log("Logging req.user:", req.user);
-  if (req.user) {
+  if (req.isAuthenticated()) {
     return next();
   }
   res.status(401).json({ message: "User is not authenticated" });
