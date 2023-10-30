@@ -2,9 +2,10 @@
   "name": "recap-note",
   "version": "1.0.0",
   "description": "Note taking app",
-  "main": "index.js",
+  "main": "./backend/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "cd ./backend && node server.js"
   },
   "repository": {
     "type": "git",
