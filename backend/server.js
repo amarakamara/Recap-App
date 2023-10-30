@@ -111,24 +111,20 @@ function validateObjectId(id) {
 
 /**Register */
 app.post("/register", (req, res) => {
-  console.log("username before findOne:", req.body.username);
-
+  console.log("req body", req.body);
   User.findOne({ username: req.body.username })
     .then((existingUser) => {
-      console.log("username inside findOne:", req.body.username);
       if (existingUser) {
         return res.status(409).json({
           message: "Username already exists. Login Instead.",
           authenticated: false,
         });
       }
-
       const newUser = {
         username: req.body.username,
         firstName: req.body.firstName,
         lastName: req.body.lastName,
       };
-
       const password = req.body.password;
 
       const passwordRegex =
@@ -142,7 +138,6 @@ app.post("/register", (req, res) => {
         });
       }
       User.register(newUser, password, (err, user) => {
-        console.log("username inside register:", req.body.username);
         if (err) {
           console.error(err);
           return res.status(400).json({
@@ -151,7 +146,6 @@ app.post("/register", (req, res) => {
           });
         }
         passport.authenticate("local", { session: true })(req, res, () => {
-          console.log("username in authenticate:", req.body.username);
           res.status(201).json({
             message: "Registration successful",
             user: req.user,
