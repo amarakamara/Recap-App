@@ -1,3 +1,3 @@
 # _redirects
-/*
-  Access-Control-Allow-Origin: https://recap-dabd1bdd38a7.herokuapp.com
+/*  /index.html  200
+/* Access-Control-Allow-Origin: https://recap-app.onrender.com
