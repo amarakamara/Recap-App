@@ -10,16 +10,12 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
-    lastName: {
-      type: String,
-    },
+    lastName: String,
     username: {
       type: String,
       unique: true,
     },
-    password: {
-      type: String,
-    },
+    password: String,
     collections: [
       {
         type: mongoose.Schema.Types.ObjectId,

@@ -23,7 +23,7 @@ export default function Login() {
         setShowError(false);
       }, 2000);
 
-      return () => clearTimeout(timer); // Clear the timer if component unmounts
+      return () => clearTimeout(timer);
     }
   }, [showError]);
 
