@@ -21,7 +21,7 @@ export default function Page404() {
             to="/"
           >
             <ArrowRightAltIcon className="transform -scale-x-150 mr-1" />
-            Register
+            Home
           </NavLink>
         </div>
       </div>

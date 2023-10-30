@@ -193,9 +193,9 @@ export default function Welcome() {
             <div className="w-full lg:w-1/2 flex flex-row items-center">
               <Slide direction="left">
                 <p className="text-white text-lg md:text-3xl lg:text-4xl">
-                  Recap is a digital notekeeping app that allows you to save
+                  Recap is a digital note-keeping app that allows you to save
                   your notes on the go. It makes everyday note taking easy and
-                  organize.
+                  organized.
                 </p>
               </Slide>
             </div>
@@ -335,7 +335,7 @@ export default function Welcome() {
                     because I learnt alot along the way.
                   </p>
                   <p className=" mt-4  text-lg text-white lg:text-3xl block">
-                    Feel free to test it out or even us it; And don't forget to
+                    Feel free to test it out or even use it; And don't forget to
                     leave a feedback.
                   </p>
                 </div>
@@ -368,7 +368,7 @@ export default function Welcome() {
           </div>
         </section>
         <footer className="text-center bg-white shadow-md py-4 px-4">
-          <p className="text-blue mx-0">copyright @ {year}</p>
+          <p className="text-blue mx-0">copyright @ amara {year}</p>
         </footer>
       </div>
     </>
