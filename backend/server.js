@@ -121,7 +121,7 @@ app.post("/register", (req, res) => {
       }
 
       const newUser = {
-        username: req.body.username,
+        username: String(req.body.username),
         firstName: req.body.firstName,
         lastName: req.body.lastName,
       };
@@ -146,7 +146,7 @@ app.post("/register", (req, res) => {
             authenticated: false,
           });
         }
-        passport.authenticate("local")(req, res, () => {
+        passport.authenticate("local", { session: true })(req, res, () => {
           res.status(201).json({
             message: "Registration successful",
             user: req.user,
@@ -166,7 +166,7 @@ app.post("/register", (req, res) => {
 
 //Login
 app.post("/login", (req, res, next) => {
-  passport.authenticate("local", (err, user, info) => {
+  passport.authenticate("local", { session: true }, (err, user, info) => {
     if (err) {
       return res.status(500).json({
         message: "Something went wrong, try again.",
