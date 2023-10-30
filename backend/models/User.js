@@ -12,7 +12,7 @@ const userSchema = new Schema(
     },
     lastName: String,
     username: {
-      typeOfUsername: { type: String },
+      type: Schema.Types.String,
       unique: true,
     },
     password: String,
