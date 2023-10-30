@@ -146,7 +146,7 @@ app.post("/register", (req, res) => {
             authenticated: false,
           });
         }
-        passport.authenticate("local", { session: true })(req, res, () => {
+        passport.authenticate("local")(req, res, () => {
           res.status(201).json({
             message: "Registration successful",
             user: req.user,
@@ -166,7 +166,7 @@ app.post("/register", (req, res) => {
 
 //Login
 app.post("/login", (req, res, next) => {
-  passport.authenticate("local", { session: true }, (err, user, info) => {
+  passport.authenticate("local", (err, user, info) => {
     if (err) {
       return res.status(500).json({
         message: "Something went wrong, try again.",
