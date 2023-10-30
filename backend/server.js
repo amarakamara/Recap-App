@@ -70,7 +70,7 @@ app.use(
       autoRemove: "native",
     }),
     cookie: {
-      secure: true,
+      secure: process.env.ENV === "PRODUCTION",
       maxAge: 2 * 24 * 60 * 60 * 1000,
       httpOnly: true,
       sameSite: "none",
@@ -89,16 +89,13 @@ import Collection from "./models/Collection.js";
 
 passport.use(User.createStrategy());
 
-passport.serializeUser(function (user, cb) {
-  process.nextTick(function () {
-    cb(null, { id: user.id, username: user.username });
-  });
+passport.serializeUser(function (user, done) {
+  done(null, user.id);
 });
 
-passport.deserializeUser(function (user, cb) {
-  console.log("Inside deserializer");
-  process.nextTick(function () {
-    return cb(null, user);
+passport.deserializeUser(function (id, done) {
+  User.findById(id, function (err, user) {
+    done(err, user);
   });
 });
 //Auth Middlewares
@@ -156,7 +153,7 @@ app.post("/register", (req, res) => {
             authenticated: false,
           });
         }
-        passport.authenticate("local")(req, res, () => {
+        passport.authenticate("local", { session: true })(req, res, () => {
           res.status(201).json({
             message: "Registration successful",
             user: req.user,
@@ -176,7 +173,7 @@ app.post("/register", (req, res) => {
 
 //Login
 app.post("/login", (req, res, next) => {
-  passport.authenticate("local", (err, user, info) => {
+  passport.authenticate("local", { session: true }, (err, user, info) => {
     if (err) {
       return res.status(500).json({
         message: "Something went wrong, try again.",
@@ -191,7 +188,6 @@ app.post("/login", (req, res, next) => {
       });
     }
 
-    // You can perform additional actions upon successful login here
     req.login(user, (loginErr) => {
       if (loginErr) {
         return next(loginErr);
