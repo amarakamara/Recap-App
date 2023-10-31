@@ -13,7 +13,7 @@ export default function Register() {
   const [registerInfo, setRegisterInfo] = useState({
     fName: "",
     lName: "",
-    username: "",
+    email: "",
     password: "",
   });
   const [showError, setShowError] = useState(false);
@@ -51,7 +51,7 @@ export default function Register() {
       body: JSON.stringify({
         firstName: registerInfo.fName,
         lastName: registerInfo.lName,
-        username: registerInfo.username,
+        username: registerInfo.email,
         password: registerInfo.password,
       }),
     })
@@ -138,10 +138,10 @@ export default function Register() {
               />
               <input
                 onChange={handleChange}
-                id="user-username"
+                id="user-email"
                 name="username"
                 type="text"
-                value={registerInfo.username}
+                value={registerInfo.email}
                 placeholder="email"
                 autoComplete="on"
                 required
