@@ -142,7 +142,7 @@ export default function Register() {
                 name="username"
                 type="text"
                 value={registerInfo.username}
-                placeholder="username"
+                placeholder="email"
                 autoComplete="on"
                 required
               />

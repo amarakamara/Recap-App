@@ -55,7 +55,7 @@ app.use(logger("combined"));
 
 app.use(cookieParser(process.env.SESSION_SECRET));
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(express.bodyParser());
 
 app.set("trust proxy", 1);
 app.use(
@@ -112,6 +112,7 @@ function validateObjectId(id) {
 /**Register */
 app.post("/register", (req, res) => {
   const username = JSON.stringify(req.body.username);
+  
   User.findOne({ username: username })
     .then((existingUser, username) => {
       if (existingUser) {
