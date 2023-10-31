@@ -112,10 +112,8 @@ function validateObjectId(id) {
 
 /**Register */
 app.post("/register", (req, res) => {
-  const username = JSON.stringify(req.body.username);
-
-  User.findOne({ username: username })
-    .then((existingUser, username) => {
+  User.findOne({ username: req.body.username })
+    .then((existingUser) => {
       if (existingUser) {
         return res.status(409).json({
           message: "Username already exists. Login Instead.",
@@ -123,7 +121,7 @@ app.post("/register", (req, res) => {
         });
       }
       const newUser = {
-        username: username,
+        username: req.body.username,
         firstName: req.body.firstName,
         lastName: req.body.lastName,
       };
