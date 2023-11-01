@@ -95,6 +95,10 @@ passport.deserializeUser(User.deserializeUser());
 //Auth Middlewares
 function ensureAuthenticated(req, res, next) {
   console.log("req.user", req.user);
+  console.log("*************************");
+  console.log("The req", req);
+  console.log("*************************");
+  console.log("The req body", req.body);
   if (req.user) {
     return next();
   }
@@ -185,6 +189,7 @@ app.post("/login", (req, res, next) => {
       if (loginErr) {
         return next(loginErr);
       }
+      onsole.log("req.user in login", req.user);
       return res.status(200).send({
         message: "Login successful",
         user: user,
