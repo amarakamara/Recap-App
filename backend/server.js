@@ -189,7 +189,7 @@ app.post("/login", (req, res, next) => {
       if (loginErr) {
         return next(loginErr);
       }
-      onsole.log("req.user in login", req.user);
+      console.log("req.user in login", req.user);
       return res.status(200).send({
         message: "Login successful",
         user: user,
