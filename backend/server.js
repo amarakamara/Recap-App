@@ -16,7 +16,7 @@ import MongoStore from "connect-mongo";
 
 const app = express();
 
-// Connection
+//Mongo Connection
 const uri = `mongodb+srv://akamar5050:${process.env.MONGO_PWD}@cluster0.ucoihg1.mongodb.net/recapApp?retryWrites=true&w=majority`;
 
 mongoose
@@ -94,8 +94,8 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 //Auth Middlewares
 function ensureAuthenticated(req, res, next) {
-  console.log("req.user", req.user);
-  if (req.user) {
+  console.log("req.body.user", req.body.user);
+  if (req.body.user) {
     return next();
   }
   res.status(401).json({ message: "User is not authenticated" });
