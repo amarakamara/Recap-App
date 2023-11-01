@@ -7,7 +7,6 @@ import mongoose from "mongoose";
 import session from "express-session";
 import passport from "passport";
 import passportLocalMongoose from "passport-local-mongoose";
-import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
 import cors from "cors";
@@ -37,6 +36,7 @@ mongoose
 /***** Middlewares *****/
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 const allowedOrigins = ["https://recapnote.netlify.app"];
 
@@ -54,9 +54,6 @@ app.use(cors(options));
 app.use(logger("combined"));
 
 app.use(cookieParser(process.env.SESSION_SECRET));
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 app.set("trust proxy", 1);
 app.use(
