@@ -94,8 +94,8 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 //Auth Middlewares
 function ensureAuthenticated(req, res, next) {
-  console.log("req.body.user", req.body.user);
-  if (req.body.user) {
+  console.log("req.user", req.user);
+  if (req.user) {
     return next();
   }
   res.status(401).json({ message: "User is not authenticated" });
