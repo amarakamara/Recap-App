@@ -46,6 +46,7 @@ export default function Register() {
 
     fetch(api_base + "/register", {
       method: "POST",
+      mode: "cors",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify({
