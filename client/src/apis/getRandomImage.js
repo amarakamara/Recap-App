@@ -1,3 +1,5 @@
+import fetch from "node-fetch";
+
 const api_base = process.env.REACT_APP_API_ENDPOINT;
 
 export default function getRandomImage(query) {
