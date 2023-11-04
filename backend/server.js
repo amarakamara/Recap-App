@@ -530,7 +530,7 @@ app.get("/randomImage/:query", async (req, res) => {
       `${unsplashRoot}/photos/random?query=${query}&client_id=${clientId}`
     );
 
-    if (!response.ok) {
+    if (response.status !== 200) {
       throw new Error("Failed to fetch photo data from Unsplash.");
     }
     const photoData = await response.json();
