@@ -12,6 +12,7 @@ import logger from "morgan";
 import cors from "cors";
 import { stringify, parse } from "flatted";
 import MongoStore from "connect-mongo";
+import axios from "axios";
 
 const app = express();
 
@@ -525,11 +526,8 @@ app.get("/randomImage/:query", async (req, res) => {
   const query = req.params.query;
 
   try {
-    const response = await fetch(
-      `${unsplashRoot}/photos/random?query=${query}&client_id=${clientId}`,
-      {
-        method: "GET",
-      }
+    const response = await axios.get(
+      `${unsplashRoot}/photos/random?query=${query}&client_id=${clientId}`
     );
 
     if (!response.ok) {
