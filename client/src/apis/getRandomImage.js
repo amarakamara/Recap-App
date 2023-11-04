@@ -1,17 +1,19 @@
-import fetch from "node-fetch";
+import axios from "axios";
 
 const api_base = process.env.REACT_APP_API_ENDPOINT;
 
 export default function getRandomImage(query) {
-  return fetch(api_base + `/randomImage/${query}`, {
-    method: "GET",
-    credentials: "include",
-  })
+  const url = `${api_base}/randomImage/${query}`;
+
+  return axios
+    .get(url, {
+      withCredentials: true,
+    })
     .then((response) => {
-      if (!response.ok) {
+      if (response.status !== 200) {
         throw new Error("Network response was not ok");
       }
-      return response.json();
+      return response.data;
     })
     .then((data) => {
       const imageUrl = data;
