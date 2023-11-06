@@ -7,6 +7,7 @@ const api_base = process.env.REACT_APP_API_ENDPOINT;
 
 export default function Login() {
   const { setIsAuthenticated, setJwtToken } = useAuth();
+  
   const { setUserID } = useUser();
   const [loginInfo, setLoginInfo] = useState({
     email: "",
@@ -50,6 +51,8 @@ export default function Login() {
       .then((response) => response.json())
       .then((res) => {
         if (res.authenticated) {
+          setJwtToken(res.token.toString());
+          localStorage.setItem("jwtToken", JSON.stringify(res.token));
           setIsAuthenticated(res.authenticated);
           const uid = res.user._id.toString();
           setUserID(uid);
