@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense, lazy } from "react";
 import Header from "./Header";
 import Note from "./Note";
 import Footer from "./Footer";
@@ -10,6 +10,8 @@ import AddToCollection from "../apis/AddToCollection";
 import CloseIcon from "@mui/icons-material/Close";
 import { useUser } from "../contexts/UserContext";
 import { useNote } from "../contexts/NoteContext";
+
+const LazyFooter = lazy(() => delayForDemo(import("./Footer")));
 
 import "../styles.css";
 
@@ -180,7 +182,10 @@ export default function App() {
         <AccountMobile />
         <Menu />
         <Ad />
-        <Footer />
+
+        <Suspense fallback={<div className="w-full"></div>}>
+          <LazyFooter markdown={markdown} />
+        </Suspense>
         <div className="container w-full h-full mt-5 overflow-y-scroll overflow-x-hidden  flex flex-row flex-wrap content-start px-2">
           {notes.length === 0 ? (
             <h2 className="transform -translate-x-1/2 -translate-y-1/2 text-base font-bold text-blue bg-white absolute top-1/2 left-1/2">
@@ -209,4 +214,10 @@ export default function App() {
       </div>
     </>
   );
+}
+
+function delayForDemo(promise) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, 2000);
+  }).then(() => promise);
 }
