@@ -38,10 +38,8 @@ export default function Login() {
 
   function handleSubmit(event) {
     event.preventDefault();
-
     fetch(api_base + "/login", {
       method: "POST",
-      mode: "cors",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify({
@@ -58,7 +56,6 @@ export default function Login() {
           const uid = res.user._id.toString();
           setUserID(uid);
           localStorage.setItem("userID", JSON.stringify(uid));
-
           navigate("/home", { replace: true });
         } else {
           setIsAuthenticated(res.authenticated);
