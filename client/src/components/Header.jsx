@@ -26,7 +26,6 @@ export default function Header() {
       });
 
       if (response.ok) {
-        localStorage.clear();
         navigate("/", { replace: true });
       }
     } catch (error) {

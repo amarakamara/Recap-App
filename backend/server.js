@@ -160,14 +160,11 @@ app.post("/login", (req, res, next) => {
 });
 
 //logout
-app.post("/logout", (req, res, next) => {
-  req.logout(function (err) {
-    if (err) {
-      return next(err);
-    }
-    res.status(200).json({ message: "Logged out succesfully" });
-  });
+app.post("/logout", (req, res) => {
+  localStorage.clear("jwtToken");
+  res.status(200).json({ message: "Logged out successfully" });
 });
+
 /**** get user*/
 
 // get user
@@ -224,7 +221,6 @@ app.get("/notes/:uid", async (req, res) => {
 
 //creates a new note
 app.post("/addnotes", async (req, res) => {
-  
   const token = req.headers.authorization;
   if (!token) {
     return res.status(401).json({ message: "User is not authenticated" });

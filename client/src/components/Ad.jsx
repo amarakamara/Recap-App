@@ -18,7 +18,6 @@ export default function Ad() {
       });
 
       if (response.ok) {
-        localStorage.clear();
         navigate("/", { replace: true });
       }
     } catch (error) {

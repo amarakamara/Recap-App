@@ -28,7 +28,6 @@ export default function AccountMobile() {
       });
 
       if (response.ok) {
-        localStorage.clear();
         navigate("/", { replace: true });
       }
     } catch (error) {
