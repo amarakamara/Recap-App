@@ -14,8 +14,6 @@ export default function Ad() {
 
   const navigate = useNavigate();
 
-  const { setJwtToken } = useAuth();
-
   const handleLogOut = async () => {
     try {
       const response = await fetch(api_base + "/logout", {
