@@ -51,8 +51,6 @@ export default function Login() {
       .then((res) => {
         if (res.authenticated) {
           setIsAuthenticated(res.authenticated);
-          setJwtToken(res.token.toString());
-          localStorage.setItem("jwtToken", JSON.stringify(res.token));
           const uid = res.user._id.toString();
           setUserID(uid);
           localStorage.setItem("userID", JSON.stringify(uid));
