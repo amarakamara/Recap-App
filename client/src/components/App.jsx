@@ -11,9 +11,10 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useUser } from "../contexts/UserContext";
 import { useNote } from "../contexts/NoteContext";
 
-const LazyFooter = lazy(() => delayForDemo(import("./Footer")));
-
 import "../styles.css";
+
+const LazyFooter = lazy(() => delayForDemo(import("./Footer")));
+const markdown = null;
 
 const api_base = process.env.REACT_APP_API_ENDPOINT;
 
