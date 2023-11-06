@@ -224,8 +224,8 @@ app.get("/notes/:uid", async (req, res) => {
 
 //creates a new note
 app.post("/addnotes", async (req, res) => {
+  
   const token = req.headers.authorization;
-
   if (!token) {
     return res.status(401).json({ message: "User is not authenticated" });
   }

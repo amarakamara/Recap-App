@@ -1,5 +1,5 @@
 const api_base = process.env.REACT_APP_API_ENDPOINT;
-const jwtToken = localStorage.getItem("jwtToken");
+const jwtToken = JSON.parse(localStorage.getItem("jwtToken"));
 
 const AddNoteToCollection = async (collectionId, noteId, userId) => {
   try {

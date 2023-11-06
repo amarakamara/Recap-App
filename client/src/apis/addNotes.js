@@ -1,6 +1,6 @@
 const api_base = process.env.REACT_APP_API_ENDPOINT;
 
-const jwtToken = localStorage.getItem("jwtToken");
+const jwtToken = JSON.parse(localStorage.getItem("jwtToken"));
 
 export default async function addNote(
   userInfo,
@@ -22,7 +22,6 @@ export default async function addNote(
         method: "POST",
         headers,
         credentials: "include",
-
         body: JSON.stringify({
           title: note.title,
           content: note.content,

@@ -1,5 +1,6 @@
 const api_base = process.env.REACT_APP_API_ENDPOINT;
-const jwtToken = localStorage.getItem("jwtToken");
+
+const jwtToken = JSON.parse(localStorage.getItem("jwtToken"));
 
 export default async function deleteCollection(
   id,
@@ -26,7 +27,7 @@ export default async function deleteCollection(
           )
         );
       }
-    } 
+    }
   } catch (error) {
     console.error("Error:" + error);
   }
