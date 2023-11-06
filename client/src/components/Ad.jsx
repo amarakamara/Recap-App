@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useNote } from "../contexts/NoteContext";
 import { useUser } from "../contexts/UserContext";
+import { useAuth } from "../contexts/AuthContext";
 import LogoutIcon from "@mui/icons-material/Logout";
 
 const api_base = process.env.REACT_APP_API_ENDPOINT;
@@ -9,7 +10,11 @@ const api_base = process.env.REACT_APP_API_ENDPOINT;
 export default function Ad() {
   const { notes, collections, favouriteNotes } = useNote();
   const { userInfo } = useUser();
+  const { setJwtToken } = useAuth();
+
   const navigate = useNavigate();
+
+  const { setJwtToken } = useAuth();
 
   const handleLogOut = async () => {
     try {
@@ -18,6 +23,8 @@ export default function Ad() {
       });
 
       if (response.ok) {
+        localStorage.clear();
+        setJwtToken("");
         navigate("/", { replace: true });
       }
     } catch (error) {

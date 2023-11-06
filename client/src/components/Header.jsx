@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
 import LogoutIcon from "@mui/icons-material/Logout";
+import { useAuth } from "../contexts/AuthContext";
 
 import "../styles.css";
 
@@ -12,6 +13,7 @@ export default function Header() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   // const { userID } = useUser();
   const navigate = useNavigate();
+  const { setJwtToken } = useAuth();
 
   const openMenu = () => {
     setShowMobileMenu(true);
@@ -19,6 +21,7 @@ export default function Header() {
   const closeMenu = () => {
     setShowMobileMenu(false);
   };
+
   const handleLogOut = async () => {
     try {
       const response = await fetch(api_base + "/logout", {
@@ -26,6 +29,8 @@ export default function Header() {
       });
 
       if (response.ok) {
+        localStorage.clear();
+        setJwtToken("");
         navigate("/", { replace: true });
       }
     } catch (error) {

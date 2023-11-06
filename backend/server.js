@@ -161,7 +161,6 @@ app.post("/login", (req, res, next) => {
 
 //logout
 app.post("/logout", (req, res) => {
-  localStorage.clear();
   res.status(200).json({ message: "Logged out successfully" });
 });
 
