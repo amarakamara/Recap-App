@@ -3,11 +3,12 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Menu from "../components/Menu";
 import Ad from "../components/Ad";
-import AccountMobile from "../components/AccountMobile"
+import AccountMobile from "../components/AccountMobile";
 import Note from "../components/Note";
 import AddToCollection from "../apis/AddToCollection";
 import { useNote } from "../contexts/NoteContext";
 import { useUser } from "../contexts/UserContext";
+import { useAuth } from "../contexts/AuthContext";
 import CloseIcon from "@mui/icons-material/Close";
 import "../styles.css";
 
@@ -15,6 +16,7 @@ const api_base = process.env.REACT_APP_API_ENDPOINT;
 
 export default function Favourites() {
   const { userInfo } = useUser();
+  const { jwtToken } = useAuth();
 
   const {
     notes,
@@ -34,21 +36,24 @@ export default function Favourites() {
       return;
     }
     const loadFavourites = async () => {
-      await fetch(api_base + `/favourites/${userInfo._id}`, {
-        method: "GET",
-        credentials: "include",
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network Error failed to fetch.");
-          }
-          return response.json();
+      if (jwtToken) {
+        await fetch(api_base + `/favourites/${userInfo._id}`, {
+          method: "GET",
+          credentials: "include",
+          headers: { Authorization: `Bearer ${jwtToken}` },
         })
-        .then((data) => {
-          setFavouriteNotes(data);
-          setUpdateFavourites(false);
-        })
-        .catch((error) => console.error("Error" + error.message));
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Network Error failed to fetch.");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            setFavouriteNotes(data);
+            setUpdateFavourites(false);
+          })
+          .catch((error) => console.error("Error" + error.message));
+      }
     };
 
     loadFavourites();

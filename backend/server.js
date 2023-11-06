@@ -4,15 +4,14 @@ dotenv.config();
 import { ObjectId, ServerApiVersion } from "mongodb";
 import express from "express";
 import mongoose from "mongoose";
-import session from "express-session";
 import passport from "passport";
 import passportLocalMongoose from "passport-local-mongoose";
-import cookieParser from "cookie-parser";
 import logger from "morgan";
 import cors from "cors";
 import { stringify, parse } from "flatted";
 import MongoStore from "connect-mongo";
 import axios from "axios";
+import jwt from "jsonwebtoken";
 
 const app = express();
 
@@ -54,33 +53,6 @@ const options = {
 app.use(cors(options));
 app.use(logger("combined"));
 
-app.use(cookieParser(process.env.SESSION_SECRET));
-
-app.set("trust proxy", 1);
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    saveUninitialized: false,
-    resave: false,
-    store: MongoStore.create({
-      mongoUrl: uri,
-      ttl: 48 * 60 * 60,
-      touchAfter: 24 * 3600,
-      autoRemove: "native",
-    }),
-    cookie: {
-      secure: true,
-      maxAge: 2 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
-      sameSite: "none",
-    },
-  })
-);
-
-//initialize passport
-app.use(passport.initialize());
-app.use(passport.session());
-
 /*******  Module Imports  ******/
 import Note from "./models/Note.js";
 import User from "./models/User.js";
@@ -88,16 +60,10 @@ import Collection from "./models/Collection.js";
 
 passport.use(User.createStrategy());
 
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+// JWT Secret Key
+const jwtSecret = process.env.JWT_SECRET;
+
 //Auth Middlewares
-function ensureAuthenticated(req, res, next) {
-  console.log("req.user", req.user);
-  if (req.user) {
-    return next();
-  }
-  res.status(401).json({ message: "User is not authenticated" });
-}
 
 function validateObjectId(id) {
   if (ObjectId.isValid(id)) {
@@ -144,12 +110,14 @@ app.post("/register", (req, res) => {
             authenticated: false,
           });
         }
-        passport.authenticate("local", { session: true })(req, res, () => {
-          res.status(201).json({
-            message: "Registration successful",
-            user: req.user,
-            authenticated: true,
-          });
+        const token = jwt.sign({ _id: user._id }, jwtSecret, {
+          expiresIn: "1d",
+        });
+        res.status(201).json({
+          message: "Registration successful",
+          user: req.user,
+          authenticated: true,
+          token,
         });
       });
     })
@@ -179,15 +147,14 @@ app.post("/login", (req, res, next) => {
       });
     }
 
-    req.login(user, (loginErr) => {
-      if (loginErr) {
-        return next(loginErr);
-      }
-      return res.status(200).send({
-        message: "Login successful",
-        user: user,
-        authenticated: true,
-      });
+    const token = jwt.sign({ _id: user._id }, jwtSecret, {
+      expiresIn: "1d",
+    });
+    res.status(200).json({
+      message: "Login successful",
+      user: user,
+      authenticated: true,
+      token,
     });
   })(req, res, next);
 });
@@ -204,140 +171,261 @@ app.post("/logout", (req, res, next) => {
 /**** get user*/
 
 // get user
-app.get("/user/:uid", ensureAuthenticated, async (req, res) => {
+app.get("/user/:uid", async (req, res) => {
   const uid = new ObjectId(req.params.uid);
-  if (validateObjectId(uid)) {
-    const response = await User.findOne({ _id: uid });
-    res.json(response);
-  } else {
-    console.log("Invalid Id String");
+  const token = req.headers.authorization;
+
+  if (!token) {
+    return res.status(401).json({ message: "User is not authenticated" });
   }
+  jwt.verify(token.split(" ")[1], jwtSecret, async (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
+
+    if (validateObjectId(uid)) {
+      const response = await User.findOne({ _id: uid });
+      res.json(response);
+    } else {
+      console.log("Invalid Id String");
+    }
+  });
 });
 
 //returns the notes
-app.get("/notes/:uid", ensureAuthenticated, async (req, res) => {
+app.get("/notes/:uid", async (req, res) => {
+  const token = req.headers.authorization;
   const uid = new ObjectId(req.params.uid);
-  if (validateObjectId(uid)) {
-    await Note.find({ user: uid })
-      .then((foundNotes) => {
-        if (foundNotes) {
-          res.json(foundNotes);
-        } else if (!foundNotes) {
-          res.json({ message: "No notes found" });
-        }
-      })
-      .catch((err) => console.error(err));
-  } else {
-    console.log("Invalid Id String");
+
+  if (!token) {
+    return res.status(401).json({ message: "User is not authenticated" });
   }
+
+  jwt.verify(token.split(" ")[1], jwtSecret, async (error, decoded) => {
+    if (error) {
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
+
+    if (validateObjectId(uid)) {
+      await Note.find({ user: uid })
+        .then((foundNotes) => {
+          if (foundNotes) {
+            res.json(foundNotes);
+          } else if (!foundNotes) {
+            res.json({ message: "No notes found" });
+          }
+        })
+        .catch((err) => console.error(err));
+    } else {
+      console.log("Invalid Id String");
+    }
+  });
 });
 
 //creates a new note
-app.post("/addnotes", ensureAuthenticated, async (req, res) => {
+app.post("/addnotes", async (req, res) => {
+  const token = req.headers.authorization;
+
+  if (!token) {
+    return res.status(401).json({ message: "User is not authenticated" });
+  }
+
   const title = req.body.title;
   const content = req.body.content;
   const user = req.body.userID;
 
-  const note = new Note({
-    title: title,
-    content: content,
-    user: user,
-  });
+  jwt.verify(token.split(" ")[1], jwtSecret, async (error, decoded) => {
+    if (error) {
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
 
-  try {
-    const savedNote = await note.save();
-    res.status(200).json({
-      success: true,
-      message: "Note Added Successfully!",
-      note: savedNote,
+    const note = new Note({
+      title: title,
+      content: content,
+      user: user,
     });
-  } catch (err) {
-    console.error("error adding note:", err);
-    res
-      .status(500)
-      .json({ success: false, message: "Something went wrong, try again!" });
-  }
+
+    try {
+      const savedNote = await note.save();
+      res.status(200).json({
+        success: true,
+        message: "Note Added Successfully!",
+        note: savedNote,
+      });
+    } catch (err) {
+      console.error("error adding note:", err);
+      res
+        .status(500)
+        .json({ success: false, message: "Something went wrong, try again!" });
+    }
+  });
 });
 
 //deletes a note
-app.delete("/note/delete/:nid/:uid", ensureAuthenticated, async (req, res) => {
+app.delete("/note/delete/:nid/:uid", async (req, res) => {
+  const token = req.headers.authorization;
   const uid = new ObjectId(req.params.uid);
   const nid = new ObjectId(req.params.nid);
 
-  if (validateObjectId(uid) && validateObjectId(nid)) {
-    await Note.findOneAndRemove({ _id: nid, user: uid }).then((deletedNote) => {
-      if (deletedNote) {
-        return res.status(200).json();
-      } else {
-        console.log("No note found or deleted");
-      }
-    });
-  } else {
-    console.log("Invalid Id String");
+  if (!token) {
+    return res.status(401).json({ message: "User is not authenticated" });
   }
+
+  jwt.verify(token.split(" ")[1], jwtSecret, async (error, decoded) => {
+    if (error) {
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
+
+    if (validateObjectId(uid) && validateObjectId(nid)) {
+      await Note.findOneAndRemove({ _id: nid, user: uid }).then(
+        (deletedNote) => {
+          if (deletedNote) {
+            return res
+              .status(200)
+              .json({ message: "Note deleted successfully" });
+          } else {
+            return res
+              .status(404)
+              .json({ message: "No note found or deleted" });
+          }
+        }
+      );
+    } else {
+      return res.status(400).json({ message: "Invalid ID strings" });
+    }
+  });
 });
 
 //Edit a note
-app.get("/edit/:nid/:uid", ensureAuthenticated, async (req, res) => {
-  const nid = new ObjectId(req.params.nid);
+app.get("/edit/:nid/:uid", async (req, res) => {
+  const token = req.headers.authorization;
   const uid = new ObjectId(req.params.uid);
+  const nid = new ObjectId(req.params.nid);
 
-  if (validateObjectId(uid) && validateObjectId(nid)) {
-    const editedNote = await Note.findOne({ _id: nid, user: uid });
-    res.json(editedNote);
-  } else {
-    console.log("Invalid Id String");
+  if (!token) {
+    return res.status(401).json({ message: "User is not authenticated" });
   }
+
+  jwt.verify(token.split(" ")[1], jwtSecret, async (error, decoded) => {
+    if (error) {
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
+
+    if (validateObjectId(uid) && validateObjectId(nid)) {
+      const editedNote = await Note.findOne({ _id: nid, user: uid });
+      if (editedNote) {
+        res.json(editedNote);
+      } else {
+        return res.status(404).json({ message: "Note not found" });
+      }
+    } else {
+      return res.status(400).json({ message: "Invalid ID strings" });
+    }
+  });
 });
 
-app.put("/edit/:nid/:uid", ensureAuthenticated, async (req, res) => {
+//put method editing
+
+app.put("/edit/:nid/:uid", async (req, res) => {
+  const token = req.headers.authorization;
   const uid = new ObjectId(req.params.uid);
   const nid = new ObjectId(req.params.nid);
   const title = req.body.title;
   const content = req.body.content;
 
-  if (validateObjectId(uid) && validateObjectId(nid)) {
-    const collection = await Note.findOneAndUpdate(
-      { _id: nid, user: uid },
-      { title: title, content: content }
-    );
-    res.send(stringify(collection));
-  } else {
-    console.log("Invalid Id String");
+  if (!token) {
+    return res.status(401).json({ message: "User is not authenticated" });
   }
+
+  jwt.verify(token.split(" ")[1], jwtSecret, async (error, decoded) => {
+    if (error) {
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
+
+    if (validateObjectId(uid) && validateObjectId(nid)) {
+      const updatedNote = await Note.findOneAndUpdate(
+        { _id: nid, user: uid },
+        { title: title, content: content }
+      );
+
+      if (updatedNote) {
+        res.json(updatedNote);
+      } else {
+        return res.status(404).json({ message: "Note not found" });
+      }
+    } else {
+      return res.status(400).json({ message: "Invalid ID strings" });
+    }
+  });
 });
 
-app.get("/view/:nid/:uid", ensureAuthenticated, async (req, res) => {
+//view note
+app.get("/view/:nid/:uid", async (req, res) => {
+  const token = req.headers.authorization;
   const uid = new ObjectId(req.params.uid);
   const nid = new ObjectId(req.params.nid);
 
-  if (validateObjectId(uid) && validateObjectId(nid)) {
-    const response = await Note.findOne({ _id: nid, user: uid });
-    res.json(response);
-  } else {
-    console.log("Invalid Id String");
+  if (!token) {
+    return res.status(401).json({ message: "User is not authenticated" });
   }
+
+  jwt.verify(token.split(" ")[1], jwtSecret, async (error, decoded) => {
+    if (error) {
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
+
+    if (validateObjectId(uid) && validateObjectId(nid)) {
+      const response = await Note.findOne({ _id: nid, user: uid });
+
+      if (response) {
+        res.json(response);
+      } else {
+        return res.status(404).json({ message: "Note not found" });
+      }
+    } else {
+      return res.status(400).json({ message: "Invalid ID strings" });
+    }
+  });
 });
 
 //get favourite notes
 
-app.get("/favourites/:uid", ensureAuthenticated, async (req, res) => {
+app.get("/favourites/:uid", async (req, res) => {
+  const token = req.headers.authorization;
   const uid = new ObjectId(req.params.uid);
-  if (validateObjectId(uid)) {
-    const response = await Note.find({ user: uid, favourited: true });
-    res.json(response);
-  } else {
-    console.log("Invalid Id String");
+
+  if (!token) {
+    return res.status(401).json({ message: "User is not authenticated" });
   }
+
+  jwt.verify(token.split(" ")[1], jwtSecret, async (error, decoded) => {
+    if (error) {
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
+
+    if (validateObjectId(uid)) {
+      const response = await Note.find({ user: uid, favourited: true });
+      res.json(response);
+    } else {
+      return res.status(400).json({ message: "Invalid ID string" });
+    }
+  });
 });
 
 //update favourite notes
-app.put(
-  "/toggleFavourites/:nid/:uid",
-  ensureAuthenticated,
-  async (req, res) => {
-    const uid = new ObjectId(req.params.uid);
-    const nid = new ObjectId(req.params.nid);
+app.put("/toggleFavourites/:nid/:uid", async (req, res) => {
+  const token = req.headers.authorization;
+  const uid = new ObjectId(req.params.uid);
+  const nid = new ObjectId(req.params.nid);
+
+  if (!token) {
+    return res.status(401).json({ message: "User is not authenticated" });
+  }
+
+  jwt.verify(token.split(" ")[1], jwtSecret, async (error, decoded) => {
+    if (error) {
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
 
     if (validateObjectId(uid) && validateObjectId(nid)) {
       try {
@@ -347,166 +435,236 @@ app.put(
           await foundNote.save();
           res.status(200).json({ message: "Toggle done." });
         } else {
-          console.log("Couldn't find a note with that Id");
+          return res.status(404).json({ message: "Note not found" });
         }
       } catch (error) {
         console.error("Error: " + error.message);
+        return res.status(500).json({ message: "Internal server error" });
       }
     } else {
-      console.log("Invalid Id String");
+      return res.status(400).json({ message: "Invalid ID string" });
     }
-  }
-);
+  });
+});
 
 /******  COLLECTION ***** */
 
 //get all the user collections
 
-app.get("/collections/:uid", ensureAuthenticated, async (req, res) => {
+app.get("/collections/:uid", async (req, res) => {
+  const token = req.headers.authorization;
   const uid = new ObjectId(req.params.uid);
-  if (validateObjectId(uid)) {
-    const response = await Collection.find({ user: uid });
-    res.json(response);
-  } else {
-    console.log("Invalid Id String");
+
+  if (!token) {
+    return res.status(401).json({ message: "User is not authenticated" });
   }
+
+  jwt.verify(token.split(" ")[1], jwtSecret, async (error, decoded) => {
+    if (error) {
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
+
+    if (validateObjectId(uid)) {
+      try {
+        const response = await Collection.find({ user: uid });
+        res.json(response);
+      } catch (error) {
+        console.error("Error: " + error.message);
+        return res.status(500).json({ message: "Internal server error" });
+      }
+    } else {
+      return res.status(400).json({ message: "Invalid ID string" });
+    }
+  });
 });
 
 //add note to collection
-app.patch(
-  "/collection/addnotes/:cid/:uid",
-  ensureAuthenticated,
-  async (req, res) => {
-    const cid = new ObjectId(req.params.cid);
-    const uid = new ObjectId(req.params.uid);
-    const nid = new ObjectId(req.body.noteId);
+app.patch("/collection/addnotes/:cid/:uid", async (req, res) => {
+  const token = req.headers.authorization;
+  const uid = new ObjectId(req.params.uid);
+  const cid = new ObjectId(req.params.cid);
+  const nid = new ObjectId(req.body.noteId);
+
+  if (!token) {
+    return res.status(401).json({ message: "User is not authenticated" });
+  }
+
+  jwt.verify(token.split(" ")[1], jwtSecret, async (error, decoded) => {
+    if (error) {
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
 
     if (
       validateObjectId(uid) &&
       validateObjectId(cid) &&
       validateObjectId(nid)
     ) {
-      const collection = await Collection.findOne({
-        _id: cid,
-        notes: { $in: [nid] },
-      }).exec();
+      try {
+        const collection = await Collection.findOne({
+          _id: cid,
+          notes: { $in: [nid] },
+        }).exec();
 
-      if (collection) {
-        return res
-          .status(200)
-          .json({ message: "Note already exist in collection" });
+        if (collection) {
+          return res
+            .status(200)
+            .json({ message: "Note already exists in the collection" });
+        }
+
+        await Collection.findOneAndUpdate(
+          { _id: cid, user: uid },
+          { $addToSet: { notes: nid } }
+        );
+
+        return res.status(200).json({ message: "Note added successfully" });
+      } catch (error) {
+        console.error("Error: " + error.message);
+        return res.status(500).json({ message: "Internal server error" });
       }
-
-      await Collection.findOneAndUpdate(
-        { _id: cid, user: uid },
-        { $addToSet: { notes: nid } }
-      );
-      return res.status(200).json({ message: "Note added successfully" });
     } else {
-      console.log("Invalid Id String");
-      return res.status(500).json();
+      return res.status(400).json({ message: "Invalid ID string" });
     }
-  }
-);
+  });
+});
 
 //delete note from collection
-app.patch(
-  "/collection/deletenote/:cid/:uid",
-  ensureAuthenticated,
-  async (req, res) => {
-    const cid = new ObjectId(req.params.cid);
-    const uid = new ObjectId(req.params.uid);
-    const nid = new ObjectId(req.body.noteId);
+app.patch("/collection/deletenote/:cid/:uid", async (req, res) => {
+  const token = req.headers.authorization;
+  const uid = new ObjectId(req.params.uid);
+  const cid = new ObjectId(req.params.cid);
+  const nid = new ObjectId(req.body.noteId);
+
+  if (!token) {
+    return res.status(401).json({ message: "User is not authenticated" });
+  }
+
+  jwt.verify(token.split(" ")[1], jwtSecret, async (error, decoded) => {
+    if (error) {
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
 
     if (
       validateObjectId(uid) &&
       validateObjectId(cid) &&
       validateObjectId(nid)
     ) {
-      await Collection.findOneAndUpdate(
-        { _id: cid, user: uid },
-        { $pull: { notes: nid } }
-      );
-      res.status(200).json();
+      try {
+        await Collection.findOneAndUpdate(
+          { _id: cid, user: uid },
+          { $pull: { notes: nid } }
+        );
+        return res
+          .status(200)
+          .json({ message: "Note removed from the collection" });
+      } catch (error) {
+        console.error("Error: " + error.message);
+        return res.status(500).json({ message: "Internal server error" });
+      }
     } else {
-      console.log("Invalid Id String");
+      return res.status(400).json({ message: "Invalid ID string" });
     }
-  }
-);
+  });
+});
 
 //get all notes in a collection
 
-app.get("/view-collection/:cid/:uid", ensureAuthenticated, async (req, res) => {
-  try {
-    const cid = new ObjectId(req.params.cid);
-    const uid = new ObjectId(req.params.uid);
+app.get("/view-collection/:cid/:uid", async (req, res) => {
+  const token = req.headers.authorization;
+  const cid = new ObjectId(req.params.cid);
+  const uid = new ObjectId(req.params.uid);
+
+  if (!token) {
+    return res.status(401).json({ message: "User is not authenticated" });
+  }
+
+  jwt.verify(token.split(" ")[1], jwtSecret, async (error, decoded) => {
+    if (error) {
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
 
     if (!validateObjectId(uid) || !validateObjectId(cid)) {
-      console.log("Invalid ID String");
-      res.status(400).json({ error: "Invalid ID String" });
-      return;
+      return res.status(400).json({ message: "Invalid ID String" });
     }
 
-    const collection = await Collection.findOne({
-      _id: cid,
-      user: uid,
-    }).populate("notes");
+    try {
+      const collection = await Collection.findOne({
+        _id: cid,
+        user: uid,
+      }).populate("notes");
 
-    if (!collection) {
-      console.log("Collection not found");
-      res.status(404).json({ error: "Collection not found" });
-      return;
+      if (!collection) {
+        return res.status(404).json({ message: "Collection not found" });
+      }
+
+      res.status(200).json(collection);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Internal server error" });
     }
-
-    res.send(stringify(collection));
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Internal server error" });
-  }
+  });
 });
 
 //create collection
-app.post("/createCollection", ensureAuthenticated, async (req, res) => {
+app.post("/createCollection", async (req, res) => {
+  const token = req.headers.authorization;
   const collectionName = req.body.name;
   const uid = new ObjectId(req.body.userID);
   const imageUrl = req.body.imageUrl;
 
-  if (validateObjectId(uid)) {
-    const collection = new Collection({
-      name: collectionName,
-      user: uid,
-      image: imageUrl,
-    });
-
-    try {
-      const savedCollection = await collection.save();
-      res.status(200).json({
-        success: true,
-        message: "Collection Added Successfully!",
-        collection: savedCollection,
-      });
-    } catch (err) {
-      console.error("error adding note:", err);
-      res
-        .status(500)
-        .json({ success: false, message: "Something went wrong, try again!" });
-    }
+  if (!token) {
+    return res.status(401).json({ message: "User is not authenticated" });
   }
+
+  jwt.verify(token.split(" ")[1], jwtSecret, async (error, decoded) => {
+    if (error) {
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
+
+    if (validateObjectId(uid)) {
+      const collection = new Collection({
+        name: collectionName,
+        user: uid,
+        image: imageUrl,
+      });
+
+      try {
+        const savedCollection = await collection.save();
+        res.status(200).json({
+          success: true,
+          message: "Collection Added Successfully!",
+          collection: savedCollection,
+        });
+      } catch (err) {
+        console.error("error adding note:", err);
+        res.status(500).json({
+          success: false,
+          message: "Something went wrong, try again!",
+        });
+      }
+    }
+  });
 });
 
 //delete collection
-app.delete(
-  "/collection/delete/:cid/:uid",
-  ensureAuthenticated,
-  async (req, res) => {
-    const uid = new ObjectId(req.params.uid);
-    const cid = new ObjectId(req.params.cid);
+app.delete("/collection/delete/:cid/:uid", async (req, res) => {
+  const token = req.headers.authorization;
+  const uid = new ObjectId(req.params.uid);
+  const cid = new ObjectId(req.params.cid);
+
+  if (!token) {
+    return res.status(401).json({ message: "User is not authenticated" });
+  }
+
+  jwt.verify(token.split(" ")[1], jwtSecret, async (error, decoded) => {
+    if (error) {
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
 
     if (validateObjectId(uid) && validateObjectId(cid)) {
       await Collection.findOneAndRemove({ _id: cid, user: uid }).then(
         (deletedCollection) => {
           if (deletedCollection) {
-            console.log("collection deleted");
+            console.log("Collection deleted");
           } else {
             console.log("No collection found or deleted");
           }
@@ -515,8 +673,8 @@ app.delete(
     } else {
       console.log("Invalid Id String");
     }
-  }
-);
+  });
+});
 
 //get random unsplash image for collection
 const clientId = process.env.UNSPLASH_CLIENT_ID;

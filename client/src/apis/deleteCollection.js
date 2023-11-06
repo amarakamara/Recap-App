@@ -1,4 +1,5 @@
 const api_base = process.env.REACT_APP_API_ENDPOINT;
+const jwtToken = localStorage.getItem("jwtToken");
 
 export default async function deleteCollection(
   id,
@@ -7,19 +8,25 @@ export default async function deleteCollection(
   setCollections
 ) {
   try {
-    const response = await fetch(api_base + `/collection/delete/${id}/${userInfo._id}`, {
-      method: "DELETE",
-      credentials: "include",
-    });
-
-    if (response.ok) {
-      const deletedCollection = await response.json();
-      setCollections(
-        collections.filter(
-          (collection) => collection._id !== deletedCollection._id
-        )
+    if (jwtToken) {
+      const response = await fetch(
+        api_base + `/collection/delete/${id}/${userInfo._id}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+          headers: { Authorization: `Bearer ${jwtToken}` },
+        }
       );
-    }
+
+      if (response.ok) {
+        const deletedCollection = await response.json();
+        setCollections(
+          collections.filter(
+            (collection) => collection._id !== deletedCollection._id
+          )
+        );
+      }
+    } 
   } catch (error) {
     console.error("Error:" + error);
   }

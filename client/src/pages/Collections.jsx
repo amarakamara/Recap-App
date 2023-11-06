@@ -9,6 +9,7 @@ import CreateCollection from "../components/CreateCollection";
 import AddToCollection from "../apis/AddToCollection";
 import { useNote } from "../contexts/NoteContext";
 import { useUser } from "../contexts/UserContext";
+import { useAuth } from "../contexts/AuthContext";
 import CloseIcon from "@mui/icons-material/Close";
 
 import "../styles.css";
@@ -17,6 +18,7 @@ const api_base = process.env.REACT_APP_API_ENDPOINT;
 
 export default function Collections() {
   const { userInfo } = useUser();
+  const { jwtToken } = useAuth();
 
   const {
     notes,
@@ -39,23 +41,25 @@ export default function Collections() {
     }
 
     const loadCollections = async () => {
-      await fetch(api_base + `/collections/${userInfo._id}`, {
-        method: "GET",
-        credentials: "include",
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network Error failed to fetch.");
-          }
-          return response.json();
+      if (jwtToken) {
+        await fetch(api_base + `/collections/${userInfo._id}`, {
+          method: "GET",
+          credentials: "include",
+          headers: { Authorization: `Bearer ${jwtToken}` },
         })
-        .then((data) => {
-          setCollections(data);
-          setCollectionUpdated(false);
-        })
-        .catch((error) => console.error("Error" + error.message));
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Network Error failed to fetch.");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            setCollections(data);
+            setCollectionUpdated(false);
+          })
+          .catch((error) => console.error("Error" + error.message));
+      }
     };
-
     loadCollections();
     // eslint-disable-next-line
   }, [userInfo, collectionUpdated, setCollections]);
@@ -68,17 +72,20 @@ export default function Collections() {
     }
     const loadNotes = async () => {
       try {
-        const response = await fetch(api_base + `/notes/${userInfo._id}`, {
-          method: "GET",
-          credentials: "include",
-        });
+        if (jwtToken) {
+          const response = await fetch(api_base + `/notes/${userInfo._id}`, {
+            method: "GET",
+            credentials: "include",
+            headers: { Authorization: `Bearer ${jwtToken}` },
+          });
 
-        if (!response.ok) {
-          throw new Error("Network Error failed to fetch.");
+          if (!response.ok) {
+            throw new Error("Network Error failed to fetch.");
+          }
+
+          const data = await response.json();
+          setNotes(data);
         }
-
-        const data = await response.json();
-        setNotes(data);
       } catch (error) {
         console.error("Error" + error.message);
       }

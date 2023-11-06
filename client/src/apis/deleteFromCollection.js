@@ -1,17 +1,26 @@
 const api_base = process.env.REACT_APP_API_ENDPOINT;
+const jwtToken = localStorage.getItem("jwtToken");
 
 const deleteFromCollection = async (collectionId, noteId, userId) => {
   try {
-    await fetch(api_base + `/collection/deletenote/${collectionId}/${userId}`, {
-      method: "PATCH",
-      headers: {
+    if (jwtToken) {
+      const headers = {
+        Authorization: `Bearer ${jwtToken}`,
         "content-type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({
-        noteId: noteId,
-      }),
-    });
+      };
+
+      await fetch(
+        api_base + `/collection/deletenote/${collectionId}/${userId}`,
+        {
+          method: "PATCH",
+          headers,
+          credentials: "include",
+          body: JSON.stringify({
+            noteId: noteId,
+          }),
+        }
+      );
+    }
   } catch (error) {
     console.error(error);
   }

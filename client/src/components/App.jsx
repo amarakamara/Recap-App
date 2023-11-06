@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Suspense, lazy } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import Note from "./Note";
 import Footer from "./Footer";
@@ -10,11 +10,9 @@ import AddToCollection from "../apis/AddToCollection";
 import CloseIcon from "@mui/icons-material/Close";
 import { useUser } from "../contexts/UserContext";
 import { useNote } from "../contexts/NoteContext";
+import { useAuth } from "../contexts/AuthContext";
 
 import "../styles.css";
-
-const LazyFooter = lazy(() => delayForDemo(import("./Footer")));
-const markdown = null;
 
 const api_base = process.env.REACT_APP_API_ENDPOINT;
 
@@ -31,6 +29,7 @@ export default function App() {
     showCollectionPane,
   } = useNote();
 
+  const { jwtToken } = useAuth();
   const { userInfo, userID, setUserInfo } = useUser();
   const [userInfoFetched, setUserInfoFetched] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
@@ -43,23 +42,26 @@ export default function App() {
     }
     const getUserInfo = async () => {
       try {
-        const response = await fetch(api_base + `/user/${userID}`, {
-          method: "GET",
-          credentials: "include",
-        });
+        if (jwtToken) {
+          const response = await fetch(api_base + `/user/${userID}`, {
+            method: "GET",
+            credentials: "include",
+            headers: { Authorization: `Bearer ${jwtToken}` },
+          });
 
-        if (response.ok) {
-          const data = await response.json();
-          setUserInfo(data);
-          localStorage.setItem("userInfo", JSON.stringify(data));
-          setUserInfoFetched(true);
+          if (response.ok) {
+            const data = await response.json();
+            setUserInfo(data);
+            localStorage.setItem("userInfo", JSON.stringify(data));
+            setUserInfoFetched(true);
+          }
         }
       } catch (error) {
         console.error(error);
       }
     };
     getUserInfo();
-  }, [userID, setUserInfo]);
+  }, [userID, setUserInfo, jwtToken]);
   //loadNotes
 
   useEffect(() => {
@@ -68,18 +70,21 @@ export default function App() {
     }
     const loadNotes = async () => {
       try {
-        const response = await fetch(api_base + `/notes/${userInfo._id}`, {
-          method: "GET",
-          credentials: "include",
-        });
+        if (jwtToken) {
+          const response = await fetch(api_base + `/notes/${userInfo._id}`, {
+            method: "GET",
+            credentials: "include",
+            headers: { Authorization: `Bearer ${jwtToken}` },
+          });
 
-        if (!response.ok) {
-          throw new Error("Network Error failed to fetch.");
+          if (!response.ok) {
+            throw new Error("Network Error failed to fetch.");
+          }
+
+          const data = await response.json();
+          setNotes(data);
+          setNotesUpdated(false);
         }
-
-        const data = await response.json();
-        setNotes(data);
-        setNotesUpdated(false);
       } catch (error) {
         console.error("Error" + error.message);
       }
@@ -95,20 +100,23 @@ export default function App() {
     }
 
     const loadCollections = async () => {
-      await fetch(api_base + `/collections/${userInfo._id}`, {
-        method: "GET",
-        credentials: "include",
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network Error failed to fetch.");
-          }
-          return response.json();
+      if (jwtToken) {
+        await fetch(api_base + `/collections/${userInfo._id}`, {
+          method: "GET",
+          credentials: "include",
+          headers: { Authorization: `Bearer ${jwtToken}` },
         })
-        .then((data) => {
-          setCollections(data);
-        })
-        .catch((error) => console.error("Error" + error.message));
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Network Error failed to fetch.");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            setCollections(data);
+          })
+          .catch((error) => console.error("Error" + error.message));
+      }
     };
 
     loadCollections();
@@ -183,10 +191,7 @@ export default function App() {
         <AccountMobile />
         <Menu />
         <Ad />
-
-        <Suspense fallback={<div className="w-full"></div>}>
-          <LazyFooter markdown={markdown} />
-        </Suspense>
+        <Footer />
         <div className="container w-full h-full mt-5 overflow-y-scroll overflow-x-hidden  flex flex-row flex-wrap content-start px-2">
           {notes.length === 0 ? (
             <h2 className="transform -translate-x-1/2 -translate-y-1/2 text-base font-bold text-blue bg-white absolute top-1/2 left-1/2">
@@ -215,10 +220,4 @@ export default function App() {
       </div>
     </>
   );
-}
-
-function delayForDemo(promise) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, 2000);
-  }).then(() => promise);
 }

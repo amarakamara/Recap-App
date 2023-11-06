@@ -6,7 +6,7 @@ import { useUser } from "../contexts/UserContext";
 const api_base = process.env.REACT_APP_API_ENDPOINT;
 
 export default function Login() {
-  const { setIsAuthenticated } = useAuth();
+  const { setIsAuthenticated, setJwtToken } = useAuth();
   const { setUserID } = useUser();
   const [loginInfo, setLoginInfo] = useState({
     email: "",
@@ -53,9 +53,12 @@ export default function Login() {
       .then((res) => {
         if (res.authenticated) {
           setIsAuthenticated(res.authenticated);
+          setJwtToken(res.token.toString());
+          localStorage.setItem("jwtToken", JSON.stringify(res.token));
           const uid = res.user._id.toString();
           setUserID(uid);
           localStorage.setItem("userID", JSON.stringify(uid));
+
           navigate("/home", { replace: true });
         } else {
           setIsAuthenticated(res.authenticated);

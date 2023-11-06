@@ -8,6 +8,7 @@ import AccountMobile from "../components/AccountMobile";
 import Note from "../components/Note";
 import { useNote } from "../contexts/NoteContext";
 import { useUser } from "../contexts/UserContext";
+import { useAuth } from "../contexts/AuthContext";
 import AddToCollection from "../apis/AddToCollection";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
@@ -21,6 +22,8 @@ const api_base = process.env.REACT_APP_API_ENDPOINT;
 
 export default function ViewCollection() {
   const { userInfo } = useUser();
+  const { jwtToken } = useAuth();
+
   const { collectionId } = useParams();
   const {
     notes,
@@ -38,20 +41,23 @@ export default function ViewCollection() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(
-          api_base + `/view-collection/${collectionId}/${userInfo._id}`,
-          {
-            method: "GET",
-            credentials: "include",
+        if (jwtToken) {
+          const response = await fetch(
+            api_base + `/view-collection/${collectionId}/${userInfo._id}`,
+            {
+              method: "GET",
+              credentials: "include",
+              headers: { Authorization: `Bearer ${jwtToken}` },
+            }
+          );
+          if (response.ok) {
+            const data = await response.text();
+            const returnedCollection = parse(data);
+            const notes = returnedCollection.notes;
+            setviewedCollection(returnedCollection);
+            setCollectionNotes(notes);
+            setCollectionNotesUpdated(false);
           }
-        );
-        if (response.ok) {
-          const data = await response.text();
-          const returnedCollection = parse(data);
-          const notes = returnedCollection.notes;
-          setviewedCollection(returnedCollection);
-          setCollectionNotes(notes);
-          setCollectionNotesUpdated(false);
         }
       } catch (error) {
         console.error("Error fetching collection notes: " + error.message);
@@ -60,6 +66,7 @@ export default function ViewCollection() {
 
     fetchData();
   }, [
+    jwtToken,
     collectionId,
     userInfo._id,
     collectionNotesUpdated,
@@ -72,17 +79,20 @@ export default function ViewCollection() {
     }
     const loadNotes = async () => {
       try {
-        const response = await fetch(api_base + `/notes/${userInfo._id}`, {
-          method: "GET",
-          credentials: "include",
-        });
+        if (jwtToken) {
+          const response = await fetch(api_base + `/notes/${userInfo._id}`, {
+            method: "GET",
+            credentials: "include",
+            headers: { Authorization: `Bearer ${jwtToken}` },
+          });
 
-        if (!response.ok) {
-          throw new Error("Network Error failed to fetch.");
+          if (!response.ok) {
+            throw new Error("Network Error failed to fetch.");
+          }
+
+          const data = await response.json();
+          setNotes(data);
         }
-
-        const data = await response.json();
-        setNotes(data);
       } catch (error) {
         console.error("Error" + error.message);
       }

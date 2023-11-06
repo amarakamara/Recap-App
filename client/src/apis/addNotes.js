@@ -1,5 +1,6 @@
-
 const api_base = process.env.REACT_APP_API_ENDPOINT;
+
+const jwtToken = localStorage.getItem("jwtToken");
 
 export default async function addNote(
   userInfo,
@@ -11,24 +12,30 @@ export default async function addNote(
     return;
   }
   try {
-    const response = await fetch(api_base + "/addnotes", {
-      method: "POST",
-      headers: {
+    if (jwtToken) {
+      const headers = {
+        Authorization: `Bearer ${jwtToken}`,
         "content-type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({
-        title: note.title,
-        content: note.content,
-        userID: userInfo._id,
-      }),
-    });
+      };
 
-    if (response.ok) {
-      const data = await response.json();
-      setNotes((prevNotes) => [...prevNotes, data.note]);
-      const returnedMessage = data.message;
-      return returnedMessage;
+      const response = await fetch(api_base + "/addnotes", {
+        method: "POST",
+        headers,
+        credentials: "include",
+
+        body: JSON.stringify({
+          title: note.title,
+          content: note.content,
+          userID: userInfo._id,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setNotes((prevNotes) => [...prevNotes, data.note]);
+        const returnedMessage = data.message;
+        return returnedMessage;
+      }
     }
   } catch (error) {
     setNotesUpdated(false);

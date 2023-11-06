@@ -8,12 +8,15 @@ import AccountMobile from "../components/AccountMobile";
 import Button from "@mui/material/Button";
 import { useNote } from "../contexts/NoteContext";
 import { useUser } from "../contexts/UserContext";
+import { useAuth } from "../contexts/AuthContext";
 
 import "../styles.css";
 const api_base = process.env.REACT_APP_API_ENDPOINT;
 
 export default function EditNote() {
   const { userID } = useUser();
+  const { jwtToken } = useAuth();
+
   const { noteId } = useParams();
   const { notes } = useNote();
   const [noteData, setNoteData] = useState({
@@ -24,16 +27,19 @@ export default function EditNote() {
 
   useEffect(() => {
     const noteEdited = async (noteId) => {
-      const response = await fetch(api_base + `/edit/${noteId}/${userID}`, {
-        method: "GET",
-        credentials: "include",
-      });
+      if (jwtToken) {
+        const response = await fetch(api_base + `/edit/${noteId}/${userID}`, {
+          method: "GET",
+          credentials: "include",
+          headers: { Authorization: `Bearer ${jwtToken}` },
+        });
 
-      if (!response.ok) {
-        throw new Error("Network Error failed to fetch.");
+        if (!response.ok) {
+          throw new Error("Network Error failed to fetch.");
+        }
+        const data = response.json();
+        return data;
       }
-      const data = response.json();
-      return data;
     };
 
     noteEdited(noteId)
@@ -41,19 +47,24 @@ export default function EditNote() {
         setNoteData(data);
       })
       .catch((err) => console.error(err));
-  }, [noteId, userID]);
+  }, [noteId, userID, jwtToken]);
 
   const handleClick = async (event) => {
     event.preventDefault();
     try {
-      await fetch(api_base + `/edit/${noteId}/${userID}`, {
-        method: "PUT",
-        credentials: "include",
-        headers: {
+      if (jwtToken) {
+        const headers = {
           "Content-Type": "application/json",
-        },
-        body: JSON.stringify(noteData),
-      });
+          Authorization: `Bearer ${jwtToken}`,
+        };
+
+        await fetch(api_base + `/edit/${noteId}/${userID}`, {
+          method: "PUT",
+          credentials: "include",
+          headers,
+          body: JSON.stringify(noteData),
+        });
+      }
     } catch (error) {
       setSuccess(false);
       console.error("Error:", error.message);
