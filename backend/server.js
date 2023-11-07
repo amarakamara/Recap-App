@@ -17,11 +17,11 @@ const app = express();
 //Mongo Connection
 const uri = `mongodb+srv://akamar5050:${process.env.MONGO_PWD}@cluster0.ucoihg1.mongodb.net/recapApp?retryWrites=true&w=majority`;
 
+mongoose.set("strictQuery", true);
 mongoose
   .connect(uri, {
     serverApi: {
       version: ServerApiVersion.v1,
-      strict: true,
       deprecationErrors: true,
     },
   })
