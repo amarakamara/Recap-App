@@ -3,6 +3,8 @@ import { useNavigate, NavLink } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useUser } from "../contexts/UserContext";
 import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
 const api_base = process.env.REACT_APP_API_URL;
 
@@ -18,6 +20,12 @@ export default function Login() {
 
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   useEffect(() => {
     if (showError) {
@@ -114,18 +122,29 @@ export default function Login() {
                 value={loginInfo.email}
                 autoComplete="on"
                 placeholder="Enter your email"
+                className="input"
                 required
               />
-              <input
-                onChange={handleChange}
-                id="current-password"
-                name="password"
-                type="password"
-                value={loginInfo.password}
-                autoComplete="off"
-                placeholder="Enter your password"
-                required
-              />
+              <div className="flex flex-row w-full my-2.5 mx-0 py-1 border-1 border-grey rounded-md">
+                <input
+                  onChange={handleChange}
+                  id="current-password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  value={loginInfo.password}
+                  autoComplete="off"
+                  placeholder="Enter your password"
+                  required
+                  className="w-full px-2.5 focus:outline-none"
+                />
+                <a
+                  href="#/"
+                  onClick={togglePasswordVisibility}
+                  className="w-auto bg-white text-right px-2.5"
+                >
+                  {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                </a>
+              </div>
               <button
                 className="rounded-lg w-full py-1.5 px-0 text-base font-normal text-white cursor-pointer font-poppins"
                 type="submit"

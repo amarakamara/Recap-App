@@ -3,6 +3,8 @@ import { useNavigate, NavLink } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useUser } from "../contexts/UserContext";
 import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
 const api_base = process.env.REACT_APP_API_URL;
 
@@ -20,6 +22,12 @@ export default function Register() {
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showValidator, setShowValidator] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   useEffect(() => {
     if (showError) {
       const timer = setTimeout(() => {
@@ -129,6 +137,7 @@ export default function Register() {
                 placeholder="first name"
                 autoComplete="on"
                 required
+                className="input"
               />
               <input
                 onChange={handleChange}
@@ -139,6 +148,7 @@ export default function Register() {
                 placeholder="last name"
                 autoComplete="on"
                 required
+                className="input"
               />
               <input
                 onChange={handleChange}
@@ -149,18 +159,31 @@ export default function Register() {
                 placeholder="email"
                 autoComplete="on"
                 required
+                className="input"
               />
-              <input
-                onChange={handleChange}
-                onClick={() => setShowValidator(true)}
-                id="user-password"
-                type="password"
-                name="password"
-                value={registerInfo.password}
-                placeholder="password"
-                autoComplete="off"
-                required
-              />
+
+              <div className="flex flex-row w-full my-2.5 mx-0 py-1 border-1 border-grey rounded-md">
+                <input
+                  onChange={handleChange}
+                  onClick={() => setShowValidator(true)}
+                  id="user-password"
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={registerInfo.password}
+                  placeholder="password"
+                  autoComplete="off"
+                  required
+                  className="w-full px-2.5 focus:outline-none"
+                />
+                <a
+                  href="#/"
+                  onClick={togglePasswordVisibility}
+                  className="w-auto bg-white text-right px-2.5"
+                >
+                  {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                </a>
+              </div>
+
               {showValidator && (
                 <div className="w-full pl-2 text-left mb-2">
                   {registerInfo.password.length < 8 && (
