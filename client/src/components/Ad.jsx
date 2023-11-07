@@ -5,7 +5,7 @@ import { useUser } from "../contexts/UserContext";
 import { useAuth } from "../contexts/AuthContext";
 import LogoutIcon from "@mui/icons-material/Logout";
 
-const api_base = process.env.REACT_APP_API_ENDPOINT;
+const api_base = process.env.REACT_APP_API_URL;
 
 export default function Ad() {
   const { notes, collections, favouriteNotes } = useNote();

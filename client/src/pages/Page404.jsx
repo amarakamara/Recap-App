@@ -2,6 +2,7 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 
+
 export default function Page404() {
   return (
     <div className="bg-white max-h-screen max-w-screen w-screen h-screen flex flex-col lg:flex-row justify-center items-center px-6 py-4">

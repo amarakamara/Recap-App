@@ -14,11 +14,9 @@ import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
 import Zoom from "@mui/material/Zoom";
 
-import { parse } from "flatted";
-
 import "../styles.css";
 
-const api_base = process.env.REACT_APP_API_ENDPOINT;
+const api_base = process.env.REACT_APP_API_URL;
 
 export default function ViewCollection() {
   const { userInfo } = useUser();
@@ -33,6 +31,7 @@ export default function ViewCollection() {
     setShowCollectionPane,
     showCollectionPane,
   } = useNote();
+
   const [statusMessage, setStatusMessage] = useState("");
   const [showMessage, setShowMessage] = useState(false);
   const [collectionNotes, setCollectionNotes] = useState([]);
@@ -52,7 +51,7 @@ export default function ViewCollection() {
           );
           if (response.ok) {
             const data = await response.text();
-            const returnedCollection = parse(data);
+            const returnedCollection = JSON.parse(data);
             const notes = returnedCollection.notes;
             setviewedCollection(returnedCollection);
             setCollectionNotes(notes);

@@ -7,7 +7,8 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import CloseIcon from "@mui/icons-material/Close";
 
 import "../styles.css";
-const api_base = process.env.REACT_APP_API_ENDPOINT;
+
+const api_base = process.env.REACT_APP_API_URL;
 
 export default function AccountMobile() {
   const [showAccountInfo, setShowAccountInfo] = useState(false);
@@ -43,8 +44,8 @@ export default function AccountMobile() {
   return (
     <>
       {showAccountInfo && (
-        <div className=" mobile-menu md:invisible lg:invisible absolute top-0 right-0 z-50 max-w-50vw w-vw30 h-auto bg-white">
-          <div className="top w-full h-auto py-.5 px-0 m-0 text-white flex flex-row justify-start">
+        <div className=" mobile-menu md:invisible lg:invisible absolute top-0 right-0 z-50 max-w-50vw w-vw40 h-auto bg-white">
+          <div className="top w-full h-auto py-.5 px-0 m-0 text-blue flex flex-row justify-start">
             <CloseIcon onClick={closeAccountInfo} />
           </div>
           <div className="w-full">
@@ -56,7 +57,7 @@ export default function AccountMobile() {
               />
 
               <div>
-                <h3 className="mx-3 md:mr-1 text-xs md:text-xs font-semibold text-blue">
+                <h3 className="text-center text-sm font-semibold text-blue">
                   {userInfo.firstName + " " + userInfo.lastName}
                 </h3>
               </div>
@@ -69,7 +70,7 @@ export default function AccountMobile() {
           </div>
         </div>
       )}
-      <div className="account-mobile shadow-md  mt-0 py-2 px-3 w-full flex flex-row h-auto bg-white md:invisible lg:invisible">
+      <div className="account-mobile shadow-md  mt-0 py-2 px-3 w-full flex flex-row h-auto bg-white md:invisible lg:invisible z-10">
         <div className="account-items mobile w-3/4 h-auto flex flex-row m-0">
           <div>
             <p>Notes:</p>

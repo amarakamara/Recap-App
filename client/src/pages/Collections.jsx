@@ -14,7 +14,7 @@ import CloseIcon from "@mui/icons-material/Close";
 
 import "../styles.css";
 
-const api_base = process.env.REACT_APP_API_ENDPOINT;
+const api_base = process.env.REACT_APP_API_URL;
 
 export default function Collections() {
   const { userInfo } = useUser();

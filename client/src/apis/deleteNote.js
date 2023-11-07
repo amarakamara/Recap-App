@@ -1,4 +1,4 @@
-const api_base = process.env.REACT_APP_API_ENDPOINT;
+const api_base = process.env.REACT_APP_API_URL;
 
 const jwtToken = JSON.parse(localStorage.getItem("jwtToken"));
 

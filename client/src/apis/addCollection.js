@@ -1,7 +1,8 @@
 import getRandomImage from "../apis/getRandomImage";
 
 const jwtToken = JSON.parse(localStorage.getItem("jwtToken"));
-const api_base = process.env.REACT_APP_API_ENDPOINT;
+
+const api_base = process.env.REACT_APP_API_URL;
 
 export default async function addCollection(
   userInfo,

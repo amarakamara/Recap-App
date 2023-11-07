@@ -16,6 +16,7 @@ export default function RenderCollection(props) {
     showCollectionPane,
     setCollectionId,
   } = useNote();
+
   const { userInfo } = useUser();
   const [openOption, setOpenOption] = useState(false);
 
@@ -28,6 +29,7 @@ export default function RenderCollection(props) {
     deleteCollection(props.id, userInfo, collections, setCollections);
     setCollectionUpdated(true);
   }
+  
   function toggleOptionPane() {
     setOpenOption(!openOption);
     if (showCollectionPane) {

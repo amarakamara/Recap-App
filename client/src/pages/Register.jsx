@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useUser } from "../contexts/UserContext";
+import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 
-const api_base = process.env.REACT_APP_API_ENDPOINT;
+const api_base = process.env.REACT_APP_API_URL;
 
 export default function Register() {
   const { setIsAuthenticated, setJwtToken } = useAuth();
@@ -198,6 +199,15 @@ export default function Register() {
                 to="/login"
               >
                 Already have an account? Log In!
+              </NavLink>
+            </div>
+            <div className="mt-3">
+              <NavLink
+                className="text-white  md:text-blue lg:text-blue no-underline text-xs font-bold lg:text-sm md:text-sm"
+                to="/"
+              >
+                <ArrowRightAltIcon className="transform -scale-x-150 mr-1" />
+                Go To Home
               </NavLink>
             </div>
           </div>

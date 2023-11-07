@@ -12,7 +12,7 @@ import { useAuth } from "../contexts/AuthContext";
 import CloseIcon from "@mui/icons-material/Close";
 import "../styles.css";
 
-const api_base = process.env.REACT_APP_API_ENDPOINT;
+const api_base = process.env.REACT_APP_API_URL;
 
 export default function Favourites() {
   const { userInfo } = useUser();

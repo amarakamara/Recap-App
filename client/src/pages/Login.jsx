@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useUser } from "../contexts/UserContext";
+import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 
-const api_base = process.env.REACT_APP_API_ENDPOINT;
+const api_base = process.env.REACT_APP_API_URL;
 
 export default function Login() {
   const { setIsAuthenticated, setJwtToken } = useAuth();
-  
+
   const { setUserID } = useUser();
   const [loginInfo, setLoginInfo] = useState({
     email: "",
@@ -140,12 +141,21 @@ export default function Login() {
                 Don't have an account? Let's make you one!
               </NavLink>
             </div>
+            <div className="mt-5">
+              <NavLink
+                className="text-white md:text-blue lg:text-blue no-underline text-xs font-bold lg:text-sm md:text-sm"
+                to="/"
+              >
+                <ArrowRightAltIcon className="transform -scale-x-150 mr-1" />
+                Go To Home
+              </NavLink>
+            </div>
           </div>
         </div>
         <div className="item-1 item-1 invisible md:visible lg:visible md:relative lg:relative md:overflow-hidden lg:overflow-hidden md:bg-cover lg:bg-cover md:w-full md:h-full md:basis-1/2 lg:w-full lg:h-full lg:basis-1/2 ">
           <img
             className="logReg-img lg:w-full lg:h-full md:w-full md:h-full object-cover"
-            src="https://img.freepik.com/free-photo/business-financial-concept-with-crumpled-paper-wads-spiral-notebook-pen-blue-background-flat-lay_176474-6551.jpg?w=996&t=st=1696861477~exp=1696862077~hmac=215eb8a63131a5a3c179f2c1f036819d0bd794fd1ece1e97301ee12c69ea7c97"
+            src="https://img.freepik.com/free-photo/top-view-two-decorative-books-with-blue-background_23-2147615018.jpg?w=996&t=st=1699355256~exp=1699355856~hmac=47ec45eee711403415323c5e737340a08b37153ea8118984f17a8aa014319f89"
             alt="note book"
           />
         </div>

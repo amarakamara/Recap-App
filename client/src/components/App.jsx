@@ -14,7 +14,7 @@ import { useAuth } from "../contexts/AuthContext";
 
 import "../styles.css";
 
-const api_base = process.env.REACT_APP_API_ENDPOINT;
+const api_base = process.env.REACT_APP_API_URL;
 
 export default function App() {
   const {
@@ -147,7 +147,6 @@ export default function App() {
   return (
     <>
       <CreateNote />
-
       {showCollectionPane && (
         <div className="cPane rounded-md shadow-md absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col p-0 max-h-50vh h-60 max-w-50vw w-60 bg-white text-blue z-50">
           <div className="relative flex flex-row justify-center w-full h-auto bg-blue">
@@ -178,11 +177,11 @@ export default function App() {
       )}
       {showMessage &&
         (statusMessage.includes("exist") ? (
-          <p className="text-base text-red font-semibold absolute transform -translate-x-1/2 -translate-y-1/2 top-16 right-1/4 z-50">
+          <p className="text-red text-xxs whitespace-nowrap font-semibold absolute transform -translate-x-1/2 -translate-y-1/2 top-25 md:top-16 lg:top-16 left-1/2 z-50">
             {statusMessage}
           </p>
         ) : (
-          <p className="text-base text-green font-semibold absolute transform -translate-x-1/2 -translate-y-1/2 top-16 right-1/4 z-50">
+          <p className="text-green text-xxs whitespace-nowrap font-semibold absolute transform -translate-x-1/2 -translate-y-1/2 top-25 md:top-16 lg:top-16 left-1/2 z-50">
             {statusMessage}
           </p>
         ))}

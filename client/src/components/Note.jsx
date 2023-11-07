@@ -4,17 +4,20 @@ import FavoriteOutlinedIcon from "@mui/icons-material/FavoriteOutlined";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { useUser } from "../contexts/UserContext";
 import { useNote } from "../contexts/NoteContext";
+import { useAuth } from "../contexts/AuthContext";
 import deleteNote from "../apis/deleteNote";
 import deleteFromCollection from "../apis/deleteFromCollection";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 
-const api_base = process.env.REACT_APP_API_ENDPOINT;
+const api_base = process.env.REACT_APP_API_URL;
 
 function Note(props) {
   const location = useLocation();
   const currentPath = location.pathname;
   const { collectionId } = useParams();
   const { userInfo } = useUser();
+  const { jwtToken } = useAuth();
+
   const [openOption, setOpenOption] = useState(false);
 
   const {
@@ -66,16 +69,26 @@ function Note(props) {
 
   const toggleFavourites = async () => {
     try {
-      await fetch(api_base + `/toggleFavourites/${props.id}/${userInfo._id}`, {
-        method: "PUT",
-        credentials: "include",
-      });
-      setNotesUpdated(true);
-      setUpdateFavourites(true);
+      if (jwtToken) {
+        const response = await fetch(
+          api_base + `/toggleFavourites/${props.id}/${userInfo._id}`,
+          {
+            method: "PUT",
+            credentials: "include",
+            headers: { Authorization: `Bearer ${jwtToken}` },
+          }
+        );
+
+        if (response.ok) {
+          setNotesUpdated(true);
+          setUpdateFavourites(true);
+        }
+      }
     } catch (error) {
       console.error("Error:", error);
     }
   };
+
   function handleRemove() {
     deleteFromCollection(collectionId, props.id, userInfo._id);
     setCollectionNotesUpdated(!collectionNotesUpdated);
@@ -127,9 +140,9 @@ function Note(props) {
             {contentToDisplay}
           </p>
           {screenWidth < 640
-            ? props.content.length >= 20 && (
+            ? props.content.length >= 21 && (
                 <NavLink
-                  className="text-xs text-blue inline ml-1"
+                  className="text-xss text-cyan inline ml-1"
                   to={`/view/${props.id}`}
                 >
                   read more...

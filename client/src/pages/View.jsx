@@ -10,7 +10,7 @@ import { useUser } from "../contexts/UserContext";
 import { useAuth } from "../contexts/AuthContext";
 
 import "../styles.css";
-const api_base = process.env.REACT_APP_API_ENDPOINT;
+const api_base = process.env.REACT_APP_API_URL;
 
 export default function View() {
   const { userInfo } = useUser();
@@ -57,10 +57,12 @@ export default function View() {
         <Ad notes={notes} />
         <Footer />
         <div className="container">
-          <div className="view-note w-full h-full bg-white text-blue py-5 px-10 overflow-y-scroll shadow-md">
+          <div className="view-note w-400 md:w-full lg:w-full h-full bg-white text-blue py-5 px-5 my-5 mx-auto overflow-y-scroll shadow-md">
             <h2 className="font-jost text-lg">{viewedNote.title}</h2>
             <hr className="w-full h-1" />
-            <p className="text-lg pt-5 px-0 pb-0">{viewedNote.content}</p>
+            <div className="content w-full h-auto overflow-y-scroll">
+              <p className="text-lg pt-5 px-0 pb-0">{viewedNote.content}</p>
+            </div>
           </div>
         </div>
       </div>

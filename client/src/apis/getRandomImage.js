@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const api_base = process.env.REACT_APP_API_ENDPOINT;
+const api_base = process.env.REACT_APP_API_URL;
 
 export default function getRandomImage(query) {
   const url = `${api_base}/randomImage/${query}`;

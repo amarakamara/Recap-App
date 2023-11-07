@@ -6,7 +6,7 @@ import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 import CheckIcon from "@mui/icons-material/Check";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import EmailIcon from "@mui/icons-material/Email";
+import TwitterIcon from "@mui/icons-material/Twitter";
 import { Slide } from "react-awesome-reveal";
 
 export default function Welcome() {
@@ -31,29 +31,29 @@ export default function Welcome() {
             </div>
             <ul className="menu-ul my-2 mx-0">
               <li>
-                <NavLink className="link-mobile" to="#home">
+                <a className="link-mobile" href="#home">
                   Home
-                </NavLink>
+                </a>
               </li>
               <li>
-                <NavLink className="link-mobile" to="#about">
+                <a className="link-mobile" href="#about">
                   About
-                </NavLink>
+                </a>
               </li>
               <li>
-                <NavLink className="link-mobile" to="#features">
+                <a className="link-mobile" href="#features">
                   Features
-                </NavLink>
+                </a>
               </li>
               <li>
-                <NavLink className="link-mobile" to="#developer">
+                <a className="link-mobile" href="#developer">
                   Developer
-                </NavLink>
+                </a>
               </li>
               <li>
-                <NavLink className="link-mobile" to="#contact">
+                <a className="link-mobile" href="#contact">
                   Contact
-                </NavLink>
+                </a>
               </li>
             </ul>
           </div>
@@ -358,8 +358,11 @@ export default function Welcome() {
                     >
                       <GitHubIcon />
                     </a>
-                    <a className="text-white  mr-4" href="akamar5050@gmail.com">
-                      <EmailIcon />
+                    <a
+                      className="text-white  mr-4"
+                      href="https://twitter.com/AKama25864"
+                    >
+                      <TwitterIcon />
                     </a>
                   </div>
                 </div>

@@ -9,7 +9,6 @@ import passportLocalMongoose from "passport-local-mongoose";
 import logger from "morgan";
 import cors from "cors";
 import { stringify, parse } from "flatted";
-import MongoStore from "connect-mongo";
 import axios from "axios";
 import jwt from "jsonwebtoken";
 
@@ -38,14 +37,19 @@ mongoose
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const allowedOrigins = ["https://recapnote.netlify.app"];
-
-if (process.env.NODE_ENV === "development") {
-  allowedOrigins.push("http://localhost:3000");
-}
+const allowedOrigins = [
+  "https://recapnote.netlify.app",
+  "http://localhost:3000",
+];
 
 const options = {
-  origin: allowedOrigins,
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   methods: ["GET", "POST", "PUT", "DELETE", "UPDATE", "PATCH"],
   credentials: true,
 };
@@ -148,7 +152,7 @@ app.post("/login", (req, res, next) => {
     }
 
     const token = jwt.sign({ _id: user._id }, jwtSecret, {
-      expiresIn: "1d",
+      expiresIn: "24h",
     });
     res.status(200).json({
       message: "Login successful",

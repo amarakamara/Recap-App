@@ -11,7 +11,7 @@ import { useUser } from "../contexts/UserContext";
 import { useAuth } from "../contexts/AuthContext";
 
 import "../styles.css";
-const api_base = process.env.REACT_APP_API_ENDPOINT;
+const api_base = process.env.REACT_APP_API_URL;
 
 export default function EditNote() {
   const { userID } = useUser();
@@ -91,7 +91,7 @@ export default function EditNote() {
         <Footer />
         <div className="container">
           <form
-            className="edit-form w-full h-full bg-white shadow-md rounded-md p-2.5 my-5 mx-auto"
+            className="edit-form w-400 md:w-full lg:w-full h-50 md:h-full lg:h-full bg-white shadow-md rounded-md p-2.5 my-5 mx-auto"
             method="Post"
           >
             <input

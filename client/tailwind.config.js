@@ -42,6 +42,9 @@ module.exports = {
         5: "5px",
         8: "8px",
       },
+      spacing: {
+        25: "6.5rem",
+      },
     },
     fontFamily: {
       jost: ["Jost", "sans-serif"],

@@ -7,7 +7,7 @@ import { useAuth } from "../contexts/AuthContext";
 
 import "../styles.css";
 
-const api_base = process.env.REACT_APP_API_ENDPOINT;
+const api_base = process.env.REACT_APP_API_URL;
 
 export default function Header() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -70,7 +70,7 @@ export default function Header() {
         </div>
       )}
       <header className="py-2 px-3">
-        <navbar className="header-inner w-full h-full flex flex-row flex-nowrap justify-center basis-1/2 m-0">
+        <nav className="header-inner w-full h-full flex flex-row flex-nowrap justify-center basis-1/2 m-0">
           <div className="logo-div relative w-full overflow-hidden">
             <img
               className="absolute transform -translate-x-1/2 -translate-y-1/2 left-1/4 sm:left-1/4 lg:left-24  top-1/2 w-32"
@@ -86,7 +86,7 @@ export default function Header() {
               <MenuIcon fontSize="large" />
             </button>
           </div>
-        </navbar>
+        </nav>
       </header>
     </>
   );

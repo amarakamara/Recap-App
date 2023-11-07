@@ -222,7 +222,8 @@ textarea::placeholder {
   color: #ccc;
   font-family: "Montserrat", sans-serif;
 }
-.submitNote-btn {
+.submitNote-btn,
+.contact-btn {
   background: rgb(2, 0, 36);
   background: linear-gradient(
     110deg,
@@ -284,6 +285,16 @@ form.edit-form textarea::value {
 .view-note::-webkit-scrollbar {
   display: none;
 }
+
+.view-note .content {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.view-note .content::-webkit-scrollbar {
+  display: none;
+}
+
 .view-note hr {
   background: rgb(2, 0, 36);
   background: linear-gradient(
