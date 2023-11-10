@@ -119,7 +119,7 @@ app.post("/register", (req, res) => {
         });
         res.status(201).json({
           message: "Registration successful",
-          user: req.user,
+          user: user,
           authenticated: true,
           token,
         });
