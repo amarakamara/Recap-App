@@ -153,15 +153,13 @@ export default function Register() {
               <input
                 onChange={handleChange}
                 id="user-email"
-                name="username"
+                name="email"
                 type="text"
                 value={registerInfo.email}
                 placeholder="email"
-                autoComplete="on"
                 required
                 className="input"
               />
-
               <div className="flex flex-row w-full my-2.5 mx-0 py-1 border-1 border-grey rounded-md">
                 <input
                   onChange={handleChange}
