@@ -1,11 +1,20 @@
 # Recap-App
+
+# What is Recaop?
+
 My first Fullstack Mern App. Recap is a note app that makes everyday note taking easier.
 
-The app allows users to: Add Notes, Edit Notes , Delete Notes , Create Collections , Add and Remove Notes from collections.
+# Features
 
- Tech Stack: Mongodb , Express, React
+The app allows users to: 
+-Add Notes, Edit Notes
+-Delete Notes
+-Create Collections
+-Add and Remove Notes from collections.
 
- The app makes use of the unsplash image api, react context api for global variable management, and passportjs for security.
+# Tech Stack
+Mern, Unsplash Image Api
+The app makes use of the unsplash image api, react context api for global variable management, and passportjs for security.
  
 ![recap6](https://github.com/amarakamara/Recap-App/assets/122091196/3569600d-202c-47b0-b47d-faa8517f8eb2)
 ![recap1](https://github.com/amarakamara/Recap-App/assets/122091196/43f29a35-a613-4c7c-808c-bd88f342d2a8)
