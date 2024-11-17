@@ -1,6 +1,6 @@
 # Recap-App
 
-# What is Recaop?
+# What is Recap?
 
 My first Fullstack Mern App. Recap is a note app that makes everyday note taking easier.
 
