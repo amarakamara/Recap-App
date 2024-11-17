@@ -13,8 +13,8 @@ export default function Login() {
 
   const { setUserID } = useUser();
   const [loginInfo, setLoginInfo] = useState({
-    email: "",
-    password: "",
+    email: "kamaraamara8507@gmail.com",
+    password: "noteapp@123",
   });
   const navigate = useNavigate();
 
@@ -113,37 +113,41 @@ export default function Login() {
                   <p className="text-sm md:text-xs text-red">{errorMessage}</p>
                 </div>
               )}
-
-              <input
-                onChange={handleChange}
-                id="login-email"
-                name="email"
-                type="text"
-                value={loginInfo.email}
-                autoComplete="on"
-                placeholder="Enter your email"
-                className="input"
-                required
-              />
-              <div className="flex flex-row w-full my-2.5 mx-0 py-1 border-1 border-grey rounded-md">
+              <div className="input">
                 <input
                   onChange={handleChange}
-                  id="current-password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  value={loginInfo.password}
-                  autoComplete="off"
-                  placeholder="Enter your password"
+                  id="login-email"
+                  name="email"
+                  type="text"
+                  value={loginInfo.email}
+                  autoComplete="on"
+                  placeholder="Enter your email"
+                  className="w-full py-2 px-2"
                   required
-                  className="w-full px-2.5 focus:outline-none"
                 />
-                <a
-                  href="#/"
-                  onClick={togglePasswordVisibility}
-                  className="w-auto bg-white text-right px-2.5"
-                >
-                  {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                </a>
+              </div>
+
+              <div className="input my-2.5 border-1 border-grey rounded-md">
+                <div className="w-full flex flex-row py-2 px-2">
+                  <input
+                    onChange={handleChange}
+                    id="current-password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    value={loginInfo.password}
+                    autoComplete="off"
+                    placeholder="Enter your password"
+                    required
+                    className="w-full focus:outline-none"
+                  />
+                  <a
+                    href="#/"
+                    onClick={togglePasswordVisibility}
+                    className=" bg-white px-2.5"
+                  >
+                    {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                  </a>
+                </div>
               </div>
               <button
                 className="rounded-lg w-full py-1.5 px-0 text-base font-normal text-white cursor-pointer font-poppins"

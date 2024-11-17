@@ -31,6 +31,7 @@ export default function App() {
 
   const { jwtToken } = useAuth();
   const { userInfo, userID, setUserInfo } = useUser();
+  
   const [userInfoFetched, setUserInfoFetched] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
   const [showMessage, setShowMessage] = useState(false);

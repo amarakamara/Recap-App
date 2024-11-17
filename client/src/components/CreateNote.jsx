@@ -58,7 +58,7 @@ export default function CreateNote(props) {
 
   return (
     <>
-      <div className="absolute w-full max-w-screen max-h-screen h-screen flex flex-col items-center justify-center ">
+      <div className="absolute w-full max-w-screen max-h-screen h-screen flex flex-col items-center justify-center overflow-hidden">
         {isExpanded && (
           <form
             className="w-80 lg:w-1/2 md:w-1/3 h-auto bg-white rounded-md shadow-md flex flex-col pt-4 px-0 pb-0 absolute right-auto left-auto top-auto z-50 overflow-auto"
@@ -66,9 +66,9 @@ export default function CreateNote(props) {
           >
             {showMessage &&
               (statusMessage.includes("Successfully") ? (
-                <p className="text-green">{statusMessage}</p>
+                <p className="text-green ml-2">{statusMessage}</p>
               ) : (
-                <p className="text-red">{statusMessage}</p>
+                <p className="text-red ml-2">{statusMessage}</p>
               ))}
             <CancelButton click={close} />
             <input
@@ -85,7 +85,7 @@ export default function CreateNote(props) {
               name="content"
               placeholder="note.."
               value={note.content}
-              className="border-0 mb-3 ml-2 p-2.5 block"
+              className="border-0 mb-3 ml-2 p-2.5 block overflow-hidden"
             />
             <button
               type="submit"

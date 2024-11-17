@@ -30,7 +30,7 @@ export function AuthProvider(props) {
     localStorage.setItem("isAuthenticated", isAuthenticated.toString());
   }, [isAuthenticated]);
 
-  const values = { isAuthenticated, setIsAuthenticated, jwtToken, setJwtToken };
+  const values = { isAuthenticated,     setIsAuthenticated, jwtToken, setJwtToken };
 
   return (
     <AuthContext.Provider value={values}>{props.children}</AuthContext.Provider>
